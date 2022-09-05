@@ -5,11 +5,8 @@ from math import log
 
 
 def download_data(code, years):
-    dates = []
-    values = []
-
     ts_end = int(dt.datetime.now().timestamp())
-    ts_start = ts_end - 10 * 365 * 86400
+    ts_start = ts_end - years * 365 * 86400
 
     data = pd.read_csv(f"https://query1.finance.yahoo.com/v7/finance/download/{code}?period1={ts_start}&period2={ts_end}&interval=1d&events=history&includeAdjustedClose=true", sep=',')
     data = data.drop('Volume', axis='columns')
@@ -39,8 +36,8 @@ def main():
     plt.style.use('seaborn-whitegrid')
     make_plot(data, lambda x: x, "$")
     make_plot(data, lambda x: log(x), "ln$")
-    make_plot(data, lambda x: log(x / max_value), "ln($/$max)")
-    make_plot(data, lambda x: log(x / min_value), "ln($/$min)")
+    make_plot(data, lambda x: log(x / max_value), "ln(\$/\$max)")
+    make_plot(data, lambda x: log(x / min_value), "ln(\$/\$min)")
 
     plt.show()
 
