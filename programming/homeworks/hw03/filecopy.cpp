@@ -1,20 +1,30 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <string>
 
 int main(int argc, char *argv[])
 {
+	std::string s;
+	std::cout << "Enter content of file >> ";
+	getline(std::cin, s);
+
 	std::ofstream fo;
 	fo.open("test");
-	fo << "TEST FILE CONTENT";
+	if (!fo.is_open()) {
+		std::cout << "Can not open file for writing\n";
+		return 1;
+	}
+	fo << s;
 	fo.close();
 
 	std::ifstream fi;
-	std::stringstream buf;
 	fi.open("test");
-	buf << fi.rdbuf();
+	if (!fi.is_open()) {
+		std::cout << "Can not open file for reading\n";
+		return 1;
+	}
+	std::getline(fi, s);
 	fi.close();
 
-	std::cout << buf.str();
-
+	std::cout << "Content of file:\n" << s << '\n';
 }
