@@ -5,8 +5,12 @@
 int main(int argc, char *argv[])
 {
 	std::string s;
-	std::cout << "Enter content of file >> ";
-	getline(std::cin, s);
+	std::string cs;
+	std::cout << "Enter content of file >>\n";
+	while (s.empty() || !cs.empty()) {
+		getline(std::cin, cs);
+		s += cs + '\n';
+	}
 
 	std::ofstream fo;
 	fo.open("test");
@@ -23,8 +27,9 @@ int main(int argc, char *argv[])
 		std::cout << "Can not open file for reading\n";
 		return 1;
 	}
-	std::getline(fi, s);
+	std::cout << "Content of file:\n";
+	while (std::getline(fi, s)) {
+		std::cout << s << '\n';
+	}
 	fi.close();
-
-	std::cout << "Content of file:\n" << s << '\n';
 }

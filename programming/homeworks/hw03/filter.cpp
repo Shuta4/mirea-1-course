@@ -27,9 +27,12 @@ int main(int argc, char *argv[])
 	fi.close();
 
 	std::cout << "Filtered string: ";
-	for (auto c : s) {
+	for (int i = 0; i < s.size(); i++) {
+		auto c = s[i];
 		if (std::isdigit(c)) {
 			std::cout << c;
+		} else if (i > 0 && std::isdigit(s[i - 1])) {
+			std::cout << ' ';
 		}
 	}
 	std::cout << '\n';

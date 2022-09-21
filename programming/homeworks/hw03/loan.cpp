@@ -9,13 +9,8 @@ int main(int argc, char *argv[])
 	std::cout << "Enter S, p and n: ";
 	std::cin >> S >> p >> n;
 
-	if (S == 0 || n == 0 || p == 0) {
-		std::cout << "S, p and n can not be 0\n";
-		return 1;
-	}
-
-	if (n < 0) {
-		std::cout << "n must be greater then 0\n";
+	if (S <= 0 || n <= 0 || p <= 0) {
+		std::cout << "S, p and n must be greater then 0\n";
 		return 1;
 	}
 
