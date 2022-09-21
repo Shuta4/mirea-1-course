@@ -15,7 +15,7 @@ int convert_to_10(std::string num, int base) {
 			n = c - 'A' + 10;
 		}
 
-		if (n > base) {
+		if (n >= base) {
 			return -1;
 		}
 
@@ -26,6 +26,10 @@ int convert_to_10(std::string num, int base) {
 }
 
 std::string convert_from_10(int num, int base) {
+	if (num == 0) {
+		return "0";
+	}
+
 	std::string result;
 
 	while(num > 0) {

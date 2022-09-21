@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cmath>
 
 int main(int argc, char *argv[]) {
 	std::string roman;
@@ -20,12 +21,17 @@ int main(int argc, char *argv[]) {
 	int n = 0;
 	for (int i = 0; i < roman.size(); i++) {
 		auto c = std::toupper(roman[i]);
-		auto nextc = std::toupper(roman[i + 1]);
-		if (values[c] < values[nextc]) {
-			n -= values[c];
-		} else {
-			n += values[c];
+		auto val = values[c];
+		for (int j = i + 1; j < roman.size(); j++) {
+			auto nextc = std::toupper(roman[j]);
+			if (j == i + 1 && val < values[nextc]) {
+				val *= -1;
+			} else if (std::abs(val) < values[nextc]) {
+				std::cout << "This is incorrect Roman number\n";
+				return 1;
+			}
 		}
+		n += val;
 	}
 
 	std::cout << "Number = " << n << '\n';
