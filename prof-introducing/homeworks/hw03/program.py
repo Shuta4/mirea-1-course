@@ -57,19 +57,25 @@ def main():
 
     print('Downloading data...')
     data = download_data(code, years)
-    max_value = data['Close'].max()
-    min_value = data['Close'].min()
 
     print('Creating plots...')
     plt.style.use('seaborn-whitegrid')
     make_plot(data, lambda x: x, "$")
     make_plot(data, lambda x: log(x), "ln$")
     make_plot(data, lambda x: 1 / x, "1/$")
-    #make_plot(data, lambda x: log(x / max_value), "ln(\$/\$max)")
-    #make_plot(data, lambda x: log(x / min_value), "ln(\$/\$min)")
 
-    #make_counts_plot(data)
-    #make_rank_plot(data)
+    growth_data = data.loc[data['Date'] > dt.datetime.fromisoformat('2021-05-01'), ['Date', 'Close']]
+    min_value = growth_data['Close'].min()
+    max_value = growth_data['Close'].max()
+    min_date = [date for date, close in growth_data.values if close == min_value][0]
+    max_date = [date for date, close in growth_data.values if close == max_value][0]
+    plt.plot([min_date, max_date], [1 / min_value, 1 / max_value], 'r')
+
+    anam_a = ((1 / min_value) - (1 / max_value)) / (min_date.timestamp() - max_date.timestamp())
+    anam_b = (1 / min_value) - anam_a * min_date.timestamp()
+    plt.plot([max_date, dt.datetime.fromtimestamp(-anam_b / anam_a)], [1 / max_value, 0], '--')
+
+    make_rank_plot(data)
 
     plt.show()
 
