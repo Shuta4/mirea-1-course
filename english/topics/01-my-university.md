@@ -1,0 +1,8 @@
+# My University
+I am studing in Russian Technological University in the Institute of Information Technologies. RTU is state university based in Moscow with a branches in Fryazino and Stavropol.
+
+The history of RTU begins on May 28, 1947 when the Correspondence Institute for Advanced Training of Engineering and Technical Workers of the Ministry of Power Plants and Electrical Industry of the USSR was transformed into the All-Union Correspondence Power Engineering Institute for the Training and Improvement of Engineers. The University got the name of the Moscow Institute of Radio Engineering, Electronics and Automation on June 30, 1967. In 1993, MIREA was granted the status of a technical university. In 2018, by the decision of the Ministry of Education and Science of Russia, the Federal State Budget Educational Institution "MIREA — Russian Technological University" was created as part of 7 other institutes and universities.
+
+Nowadays RTU consist of 7 institutes and more then 50 departments. The teaching staff of University includes 21 academicians and corresponding members of the Russian Academy of Sciences, as well as more than 280 members of other academies and scientific societies, including international ones. Nearly 9500 applicants were enrolled in 2022.
+
+The RTU MIREA team won second place at the First All-Russian Hackathon in the discipline "Chemistry and Physics of Polymers". Also it has 13th place in the rating of media activitiy of Russian universities. Teachers of the Lomonosov Institute of Fine Chemical Technologies became winners of the All-Russian Contest "Golden Names of Higher Education".
