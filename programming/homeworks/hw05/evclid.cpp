@@ -19,6 +19,8 @@ int main(int argc, char *argv[]) {
 
 	// subtraction
 	int s_a = a, s_b = b;
+	if (s_a == 0) s_a = s_b;
+	if (s_b == 0) s_b = s_a;
 	while (s_a != s_b) {
 		if (s_a > s_b) {
 			s_a -= s_b;
