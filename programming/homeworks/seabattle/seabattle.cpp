@@ -1,6 +1,11 @@
 #include <ncurses.h>
 #include <vector>
 #include <map>
+#include <random>
+#include <cmath>
+
+std::random_device rd;
+std::mt19937 gen(rd());
 
 struct Coords {
 	unsigned int x; unsigned int y;
@@ -206,7 +211,80 @@ public:
 		return true;
 	}
 
+	auto checkShipPosition(int ship_index) {
+		auto &ship = ships[ship_index];
+		auto our_cells = ship.getCells();
+		for (unsigned int i = 0; i < ships.size(); i++) {
+			if ((int) i == ship_index) continue;
+
+			auto ship_cells = ships[i].getCells();
+			for (unsigned int j = 0; j < ship_cells.size(); j++) {
+				auto c = ship_cells[j].first;
+				for (unsigned int k = 0; k < our_cells.size(); k++) {
+					if ((c.x == our_cells[k].first.x + 1 ||
+							c.x == our_cells[k].first.x - 1 ||
+							c.x == our_cells[k].first.x) &&
+							(c.y == our_cells[k].first.y + 1 ||
+							c.y == our_cells[k].first.y - 1 ||
+							c.y == our_cells[k].first.y)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	auto placeShipsRandomly() {
+		while (ships.size()) {
+			removeShip(0);
+		}
+		unsigned int tries = 0;
+		if (!placeShipRandomly(4, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(3, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(3, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(2, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(2, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(2, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(1, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(1, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(1, tries)) return false;
+		tries = 0;
+		if (!placeShipRandomly(1, tries)) return false;
+		return true;
+	}
+
 private:
+	bool placeShipRandomly(unsigned int, unsigned int &);
+
+	Ship::Direction getRandomDirection() {
+		using enum Ship::Direction;
+		std::uniform_int_distribution<int> what_dir(0, 3);
+		switch (what_dir(gen)) {
+			case 0:
+				return up;
+				break;
+			case 1:
+				return right;
+				break;
+			case 2:
+				return down;
+				break;
+			case 3:
+				return left;
+				break;
+		}
+		return up;
+	}
+
 	State state;
 	std::vector<Ship> ships;
 	std::map<int, int> sized_ships_count;
@@ -332,10 +410,10 @@ public:
 			mvwaddch(win, middle_y, (width - 1) / 2, ch);
 		}
 
-		wrefresh(win);
-
 		/* Turn off all setted attrs for maintainability */
 		wstandend(win);
+
+		wrefresh(win);
 	}
 
 private:
@@ -491,7 +569,6 @@ auto processInput(GameField &gf, FieldState &fs,
 	if (fs.getState() == FieldState::State::prepairing && selected_ship != -1) {
 		auto &ships = fs.getShips();
 		auto &ship = ships[selected_ship];
-		auto our_cells = ship.getCells();
 		auto dir = ship.getDirection();
 		auto c = ship.getCoords();
 		auto size = ship.getSize();
@@ -549,28 +626,7 @@ auto processInput(GameField &gf, FieldState &fs,
 					}
 				break;
 			case InputType::enter:
-				next = true;
-				for (unsigned int i = 0; i < ships.size(); i++) {
-					if ((int) i == selected_ship) continue;
-
-					auto ship_cells = ships[i].getCells();
-					for (unsigned int j = 0; j < ship_cells.size(); j++) {
-						auto c = ship_cells[j].first;
-						for (unsigned int k = 0; k < our_cells.size(); k++) {
-							if ((c.x == our_cells[k].first.x + 1 ||
-								 c.x == our_cells[k].first.x - 1 ||
-								 c.x == our_cells[k].first.x) &&
-								 (c.y == our_cells[k].first.y + 1 ||
-								  c.y == our_cells[k].first.y - 1 ||
-								  c.y == our_cells[k].first.y)) {
-								next = false;
-								break;
-							}
-						}
-						if (!next) break;
-					}
-					if (!next) break;
-				}
+				next = fs.checkShipPosition(selected_ship);
 				if (next) {
 					fs.selectCell({0, 0});
 				}
@@ -647,10 +703,10 @@ auto processInput(GameField &gf, FieldState &fs,
 
 class Menu {
 public:
-	enum class Item { ship1, ship2, ship3, ship4, start };
+	enum class Item { ship1, ship2, ship3, ship4, random, autoplay, start };
 
 	explicit Menu(Coords start) {
-		win = newwin(7, 12, start.y, start.x);
+		win = newwin(9, 12, start.y, start.x);
 		selected = Item::ship1;
 	}
 
@@ -680,8 +736,14 @@ public:
 		if (selected == Item::ship4) wattron(win, A_REVERSE);
 		mvwprintw(win, 4, 1, "Ship ####");
 		wattroff(win, A_REVERSE);
+		if (selected == Item::random) wattron(win, A_REVERSE);
+		mvwprintw(win, 5, 1, "Random");
+		wattroff(win, A_REVERSE);
+		if (selected == Item::autoplay) wattron(win, A_REVERSE);
+		mvwprintw(win, 6, 1, "Autoplay");
+		wattroff(win, A_REVERSE);
 		if (selected == Item::start) wattron(win, A_REVERSE);
-		mvwprintw(win, 5, 1, "Start");
+		mvwprintw(win, 7, 1, "Start");
 		wattroff(win, A_REVERSE);
 
 		wrefresh(win);
@@ -702,6 +764,12 @@ public:
 						selected = Item::ship4;
 						break;
 					case Item::ship4:
+						selected = Item::random;
+						break;
+					case Item::random:
+						selected = Item::autoplay;
+						break;
+					case Item::autoplay:
 						selected = Item::start;
 						break;
 					case Item::start:
@@ -722,8 +790,14 @@ public:
 					case Item::ship4:
 						selected = Item::ship3;
 						break;
-					case Item::start:
+					case Item::random:
 						selected = Item::ship4;
+						break;
+					case Item::autoplay:
+						selected = Item::random;
+						break;
+					case Item::start:
+						selected = Item::autoplay;
 						break;
 				};
 				break;
@@ -752,6 +826,42 @@ void FieldState::shoot(Coords c) {
 	shooted_cells.push_back(c);
 }
 
+bool FieldState::placeShipRandomly(unsigned int size, unsigned int &tries) {
+	auto dir = getRandomDirection();
+	unsigned int left_offset(0), right_offset(0), top_offset(0), bot_offset(0);
+	switch (dir) {
+		case Ship::Direction::up:
+			top_offset = size;
+			break;
+		case Ship::Direction::right:
+			right_offset = size;
+			break;
+		case Ship::Direction::down:
+			bot_offset = size;
+			break;
+		case Ship::Direction::left:
+			left_offset = size;
+			break;
+	}
+
+	std::uniform_int_distribution<unsigned int> x_where(
+			left_offset, GameField::columns - 1 - right_offset);
+	std::uniform_int_distribution<unsigned int> y_where(
+			top_offset, GameField::rows - 1 - bot_offset);
+
+	Ship s(Coords({x_where(gen), y_where(gen)}), dir, size);
+	if (!addShip(s)) return false;
+	if (!checkShipPosition(ships.size() - 1)) {
+		tries++;
+		if (tries >= 100) {
+			return false;
+		}
+		removeShip(ships.size() - 1);
+		placeShipRandomly(size, tries);
+	};
+	return true;
+}
+
 class StatusBar {
 public:
 	explicit StatusBar(Coords start) {
@@ -770,11 +880,128 @@ private:
 	unsigned int width;
 };
 
+struct Autoplay {
+	bool on;
+	std::vector<Coords> last_shooted;
+};
+
+bool autoShoot(Autoplay &conf, FieldState &fs) {
+	bool next = true;
+	Coords coords({0, 0});
+
+	if (conf.last_shooted.size() == 0) {
+		std::uniform_int_distribution<unsigned int> x_where(0, GameField::columns - 1);
+		std::uniform_int_distribution<unsigned int> y_where(0, GameField::rows - 1);
+
+		while(true) {
+			coords.x = x_where(gen);
+			coords.y = y_where(gen);
+			if (fs.isShooted(coords)) {
+				continue;
+			}
+			break;
+		}
+	} else {
+		if (conf.last_shooted.size() == 1) {
+			std::uniform_int_distribution<unsigned int> dir(0, 3);
+
+			while (true) {
+				coords = conf.last_shooted[0];
+
+				switch(dir(gen)) {
+					case 0: /* Up */
+						if (coords.y == 0) continue;
+						coords.y = coords.y - 1;
+						break;
+					case 1: /* Right */
+						if (coords.x == GameField::columns - 1) continue;
+						coords.x = coords.x + 1;
+						break;
+					case 2: /* Down */
+						if (coords.y == GameField::rows - 1) continue;
+						coords.y = coords.y + 1;
+						break;
+					case 3: /* Left */
+						if (coords.x == 0) continue;
+						coords.x = coords.x - 1;
+						break;
+				}
+				if (fs.isShooted(coords)) {
+					continue;
+				}
+				break;
+			}
+		} else {
+			std::uniform_int_distribution<unsigned int> dir(0, 1);
+			std::uniform_int_distribution<unsigned int> what_el(0, conf.last_shooted.size() - 1);
+			while (true) {
+				coords = conf.last_shooted[what_el(gen)];
+
+				auto coords1 = conf.last_shooted[0];
+				auto coords2 = conf.last_shooted[1];
+				auto d_coords = Coords({
+						(unsigned int) std::abs((int) coords2.x - (int) coords1.x),
+						(unsigned int) std::abs((int) coords2.y - (int) coords1.y)
+					});
+
+				unsigned int d_x = d_coords.x > 0 ? 1 : 0;
+				unsigned int d_y = d_coords.y > 0 ? 1 : 0;
+
+				switch(dir(gen)) {
+					case 0: /* Inc */
+						if (coords.y == 0) continue;
+						coords.x = coords.x + d_x * 1;
+						coords.y = coords.y + d_y * 1;
+						break;
+					case 1: /* Dec */
+						if (coords.x == GameField::columns - 1) continue;
+						coords.x = coords.x - d_x * 1;
+						coords.y = coords.y - d_y * 1;
+						break;
+				}
+				if (fs.isShooted(coords)) {
+					continue;
+				}
+				break;
+			}
+		}
+	}
+	fs.selectCell(coords);
+	fs.shoot(coords);
+	for (auto &ship : fs.getShips()) {
+		auto ship_cells = ship.getCells();
+		for (unsigned int i = 0; i < ship_cells.size(); i++) {
+			auto c = ship_cells[i].first;
+			if (c.x == coords.x && c.y == coords.y) {
+				ship.shoot(i);
+				conf.last_shooted.push_back(coords);
+				if (ship.isKilled()) {
+					conf.last_shooted.clear();
+					for (unsigned int j = 0; j < ship_cells.size(); j++) {
+						auto sc = ship_cells[j].first;
+						fs.shoot(Coords({sc.x + 1, sc.y}));
+						fs.shoot(Coords({sc.x + 1, sc.y + 1}));
+						fs.shoot(Coords({sc.x + 1, sc.y - 1}));
+						fs.shoot(Coords({sc.x - 1, sc.y}));
+						fs.shoot(Coords({sc.x - 1, sc.y + 1}));
+						fs.shoot(Coords({sc.x - 1, sc.y - 1}));
+						fs.shoot(Coords({sc.x, sc.y - 1}));
+						fs.shoot(Coords({sc.x, sc.y + 1}));
+					}
+				}
+				next = false;
+			}
+		}
+	}
+	return next;
+}
+
 int main() {
 	initscr();
 	noecho();
 	cbreak();
 	curs_set(0);
+	keypad(stdscr, true);
 	if (!has_colors()) {
 		printw("Your terminal does not support colors! Press any key to exit...");
 		getch();
@@ -786,8 +1013,25 @@ int main() {
 	init_pair(2, COLOR_BLUE, COLOR_BLACK);
 	refresh();
 
+	mvprintw(1, 1, "Use WASD to move selection");
+	mvprintw(2, 1, "TAB to switch between menu and field");
+	mvprintw(3, 1, "SPACE to place or select ship and");
+	mvprintw(4, 1, "C or BACKSPACE to cancel.");
+	mvprintw(5, 1, "R to rotate ship.");
+
+	mvprintw(7, 1, "1. Player 1. Place ships");
+	mvprintw(8, 1, "2. Player 1. Click start");
+	mvprintw(9, 1, "3. Player 2. Place ships");
+	mvprintw(10, 1, "4. Player 2. Click start");
+	mvprintw(11, 1, "5. Play game");
+
+	mvprintw(13, 1, "Press any key to continue...");
+	getch();
+
 	FieldState player1_state;
 	FieldState player2_state;
+	Autoplay player1_auto;
+	Autoplay player2_auto;
 	bool player1_turn = true;
 	bool menu_selected = true;
 
@@ -829,110 +1073,179 @@ int main() {
 		else
 			status.print("Player 2: turn");
 
-		auto ch = getch();
 		auto input = InputType::none;
-		switch (ch) {
-			case 'q':
-			case 'Q':
-				quit = true;
-				break;
-			case KEY_DOWN:
-			case 'j':
-			case 'J':
-				input = InputType::down;
-				break;
-			case KEY_UP:
-			case 'k':
-			case 'K':
-				input = InputType::up;
-				break;
-			case KEY_LEFT:
-			case 'h':
-			case 'H':
-				input = InputType::left;
-				break;
-			case KEY_RIGHT:
-			case 'l':
-			case 'L':
-				input = InputType::right;
-				break;
-			case 'r':
-			case 'R':
-				input = InputType::rotate;
-				break;
-			case ' ':
-			case '\n':
-				input = InputType::enter;
-				break;
-			case 'c':
-			case 'C':
-			case 27:
-			case KEY_BACKSPACE:
-				input = InputType::cancel;
-				break;
-			case '\t':
-				if (player2_state.getState() == FieldState::State::prepairing) {
-					if ((working_with_player1 && player1_state.getSelectedShip() == -1) ||
-							(!working_with_player1 && player2_state.getSelectedShip() == -1)) {
-						menu_selected = !menu_selected;
+		if ((player1_turn && !player1_auto.on) || (!player1_turn && !player2_auto.on)) {
+			auto ch = getch();
+			switch (ch) {
+				case 'q':
+				case 'Q':
+					quit = true;
+					break;
+				case KEY_DOWN:
+				case 'j':
+				case 'J':
+				case 's':
+				case 'S':
+					input = InputType::down;
+					break;
+				case KEY_UP:
+				case 'k':
+				case 'K':
+				case 'w':
+				case 'W':
+					input = InputType::up;
+					break;
+				case KEY_LEFT:
+				case 'h':
+				case 'H':
+				case 'a':
+				case 'A':
+					input = InputType::left;
+					break;
+				case KEY_RIGHT:
+				case 'l':
+				case 'L':
+				case 'd':
+				case 'D':
+					input = InputType::right;
+					break;
+				case 'r':
+				case 'R':
+					input = InputType::rotate;
+					break;
+				case ' ':
+				case '\n':
+					input = InputType::enter;
+					break;
+				case 'c':
+				case 'C':
+				case 27:
+				case KEY_BACKSPACE:
+					input = InputType::cancel;
+					break;
+				case '\t':
+					if (player2_state.getState() == FieldState::State::prepairing) {
+						if ((working_with_player1 && player1_state.getSelectedShip() == -1) ||
+								(!working_with_player1 && player2_state.getSelectedShip() == -1)) {
+							menu_selected = !menu_selected;
+						}
 					}
-				}
-				break;
-			default:
-				continue;
+					break;
+				default:
+					continue;
+			}
 		}
 		if (quit) break;
 
-		auto next = false;
-		if (menu_selected) {
-			next = menu.processInput(input);
-		} else {
-			if (working_with_player1) next = processInput(gf, player1_state, input);
-			else next = processInput(gf, player2_state, input);
-		}
-		if (next && menu_selected) {
-			if (menu.getSelected() == Menu::Item::start) {
-				if (working_with_player1) {
-					if (player1_state.startPlaying()) {
-						player1_turn = false;
+		if (((player1_turn && player1_auto.on) || (!player1_turn && player2_auto.on)) &&
+				player1_state.getState() == FieldState::State::playing &&
+				player2_state.getState() == FieldState::State::playing &&
+				input == InputType::none) {
+			bool next = false;
+
+			if (player1_turn) {
+				next = autoShoot(player1_auto, player2_state);
+				gf.render(!menu_selected, player2_state);
+			} else {
+				next = autoShoot(player2_auto, player1_state);
+				gf.render(!menu_selected, player1_state);
+			}
+			if (working_with_player1) gf.render(!menu_selected, player1_state);
+			else gf.render(!menu_selected, player2_state);
+
+			if (player1_turn) status.print("Player 1: press any key");
+			else status.print("Player 2: press any key");
+			auto l_ch = getch();
+			if (l_ch == 'q' || l_ch == 'Q') {
+				quit = true;
+				break;
+			}
+			if (next) {
+				player1_turn = !player1_turn;
+			}
+		} else if (input != InputType::none) {
+			bool next = false;
+			if (menu_selected) {
+				next = menu.processInput(input);
+			} else {
+				if (working_with_player1) next = processInput(gf, player1_state, input);
+				else next = processInput(gf, player2_state, input);
+			}
+			if (next && menu_selected) {
+				if (menu.getSelected() == Menu::Item::start) {
+					if (working_with_player1) {
+						if (player1_state.startPlaying()) {
+							player1_turn = false;
+						}
+					} else {
+						if (player2_state.startPlaying()) {
+							player1_turn = true;
+							menu_selected = false;
+						}
 					}
-				} else {
-					if (player2_state.startPlaying()) {
+				} else if (menu.getSelected() == Menu::Item::random) {
+					if (working_with_player1) {
+						player1_state.placeShipsRandomly();
+					} else {
+						player2_state.placeShipsRandomly();
+					}
+				} else if (menu.getSelected() == Menu::Item::autoplay) {
+					if (working_with_player1) {
+						player1_auto.on = true;
+						player1_state.placeShipsRandomly();
+						player1_state.startPlaying();
+						player1_turn = false;
+					} else {
+						player2_auto.on = true;
+						player2_state.placeShipsRandomly();
+						player2_state.startPlaying();
 						player1_turn = true;
 						menu_selected = false;
 					}
-				}
-			} else {
-				menu_selected = false;
-				unsigned int size = 0;
-				switch (menu.getSelected()) {
-					case Menu::Item::start:
-						break;
-					case Menu::Item::ship1:
-						size = 1;
-						break;
-					case Menu::Item::ship2:
-						size = 2;
-						break;
-					case Menu::Item::ship3:
-						size = 3;
-						break;
-					case Menu::Item::ship4:
-						size = 4;
-						break;
-				}
-				if (working_with_player1) {
-					if (player1_state.addShip(Ship ({0, 0}, Ship::Direction::right, size)))
-						player1_state.selectShip(player1_state.getShips().size() - 1);
-					else menu_selected = true;
 				} else {
-					if (player2_state.addShip(Ship ({0, 0}, Ship::Direction::right, size)))
-						player2_state.selectShip(player2_state.getShips().size() - 1);
-					else menu_selected = true;
+					menu_selected = false;
+					unsigned int size = 0;
+					switch (menu.getSelected()) {
+						case Menu::Item::start:
+						case Menu::Item::random:
+						case Menu::Item::autoplay:
+							break;
+						case Menu::Item::ship1:
+							size = 1;
+							break;
+						case Menu::Item::ship2:
+							size = 2;
+							break;
+						case Menu::Item::ship3:
+							size = 3;
+							break;
+						case Menu::Item::ship4:
+							size = 4;
+							break;
+					}
+					if (working_with_player1) {
+						if (player1_state.addShip(Ship ({0, 0}, Ship::Direction::right, size)))
+							player1_state.selectShip(player1_state.getShips().size() - 1);
+						else menu_selected = true;
+					} else {
+						if (player2_state.addShip(Ship ({0, 0}, Ship::Direction::right, size)))
+							player2_state.selectShip(player2_state.getShips().size() - 1);
+						else menu_selected = true;
+					}
 				}
+			} else if (next && player2_state.getState() == FieldState::State::playing) {
+				if (working_with_player1) gf.render(!menu_selected, player1_state);
+				else gf.render(!menu_selected, player2_state);
+
+				if (player1_turn) status.print("Player 1: press any key");
+				else status.print("Player 2: press any key");
+				auto l_ch = getch();
+				if (l_ch == 'q' || l_ch == 'Q') {
+					quit = true;
+					break;
+				}
+				player1_turn = !player1_turn;
 			}
-		} else if (next) {
-			player1_turn = !player1_turn;
 		}
 	}
 
