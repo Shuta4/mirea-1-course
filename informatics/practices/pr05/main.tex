@@ -14,9 +14,6 @@
 \setlength{\parindent}{1.25cm}
 \usepackage[explicit,compact]{titlesec}
 \usepackage{titletoc}
-
-\titlespacing*{\chapter}{0pt}{-50pt}{0pt}
-
 \newcommand{\doublerule}[1][.4pt]{%
 	\noindent
 	\makebox[0pt][l]{\rule[.6ex]{\linewidth}{#1}}%
@@ -94,7 +91,7 @@
 		\vspace{1cm}
 
 		Принял \hfill Павлова Екатерина Сергеевна\\
-		Должность, звание, ученая степень \hfill
+		ассистент \hfill
 		\vspace{1.5cm}
 
 		\footnotesize
@@ -120,17 +117,19 @@
 	{}% unnumbered sections formatting
 	{\hfill \thecontentspage}%
 
-\titlecontents{section}[0em]
+\titlecontents{section}[1.25cm]
 	{\vskip 0.5ex}%
 	{\thecontentslabel \space}
 	{}
 	{\hfill \thecontentspage}
 
-\titleformat{\chapter}[display]
+\titleformat{\chapter}[block]
 	{\bfseries\normalsize}{}{0pt}{\uppercase{#1}}
 
-\titleformat{\section}[display]
+\titleformat{\section}[block]
 	{\bfseries\normalsize}{}{0pt}{#1}
+
+\titlespacing*{\chapter}{0pt}{-10mm}{0pt}
 
 \tableofcontents
 
@@ -139,6 +138,8 @@
 
 \titleformat{\section}[block]
 	{\hspace{\parindent}\bfseries\normalsize}{}{0pt}{\thesection \space #1}
+
+\titlespacing*{\chapter}{0pt}{-20mm}{0pt}
 
 \chapter{Постановка задачи}
 Логическая функция от четырех переменных задана в 16-теричной векторной форме. Восстановить таблицу истинности. Записать формулы СДНФ и СКНФ. Построить комбинационные схемы СДНФ и СКНФ в лабораторном комплексе, используя общий логический базис. Протестировать работу схем и убедиться в их правильности. Подготовить отчет о проделанной  работе и защитить ее.
@@ -244,7 +245,7 @@
 Запишем формулу СКНФ, для чего рассмотрим наборы значений переменных, на которых функция равна нулю (\cref{tab:3}). Для каждого набора переменные, равные единице, надо взять с отрицанием, а переменные, равные нулю, без отрицания. В результате мы получим множество совершенных дизъюнкций, объединив которые через конъюнкцию образуем формулу СКНФ (\cref{equ:2}).
 
 \begin{table}[!htbp]
-	\caption{Таблица истинности заданной функции}
+	\caption{Таблица СКНФ}
 	\label{tab:3}
 	\begin{tabular}{|c|c|c|c|c|}
 		\hline
@@ -279,24 +280,28 @@
 \section{Построение схем в лабораторном комплексе}
 Построим в лабораторном комплексе комбинационные схемы, реализующие СДНФ и СКНФ рассматриваемой функции в общем логическом базисе, протестируем их работу и убедимся в их правильности (\cref{fig:1,fig:2}).
 
-\begin{figure}[!htbp]
+\begin{figure}[htbp]
 	\centering
 	\caption{Тестирование схемы СДНФ}
 	\label{fig:1}
 	\includegraphics[width=\textwidth]{sdnf}\\
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[p]
 	\centering
 	\caption{Тестирование схемы СКНФ}
 	\label{fig:2}
 	\includegraphics[width=\textwidth]{sknf}\\
 \end{figure}
 
-\chapter{Выводы}
-Тестирование показало, что схемы работают правильно.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
 
-\chapter{Информационные источники}
+\chapter{Выводы}
+Восстановил таблицу истинности заданной логической функции от четырех переменных. Записал для нее формулы СДНФ и СКНФ. Построил комбинационные схемы СДНФ и СКНФ в лабораторном комплексе, используя общий логический базис. Протестировал работу схем и убедился в их правильности.
+
+\chapter{Информационный источник}
 \textbf{Смирнов, С. С.} Информатика : Методические указания по выполнению практических работ / С. С. Смирнов, Д. А. Карпов. -- Москва : МИРЭА -- Российский технологический университет, 2020. -- 102 с.
 
 \end{document}
