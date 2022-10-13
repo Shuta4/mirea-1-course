@@ -3,6 +3,7 @@
 #include <map>
 #include <random>
 #include <cmath>
+#include <algorithm>
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -823,6 +824,11 @@ private:
 void FieldState::shoot(Coords c) {
 	if (c.x < 0 || c.x > GameField::columns - 1 ||
 			c.y < 0 || c.y > GameField::rows - 1) return;
+	for (auto it : shooted_cells) {
+		if (it.x == c.x && it.y == c.y) {
+			return;
+		}
+	}
 	shooted_cells.push_back(c);
 }
 
@@ -885,6 +891,15 @@ struct Autoplay {
 	std::vector<Coords> last_shooted;
 };
 
+std::vector<unsigned int> numsInRandomOrder(unsigned int min, unsigned int max) {
+	std::vector<unsigned int> r(max - min + 1);
+	for (unsigned int i = min; i <= max; i++) {
+		r[i] = i;
+	}
+	std::shuffle(r.begin(), r.end(), gen);
+	return r;
+}
+
 bool autoShoot(Autoplay &conf, FieldState &fs) {
 	bool next = true;
 	Coords coords({0, 0});
@@ -901,71 +916,69 @@ bool autoShoot(Autoplay &conf, FieldState &fs) {
 			}
 			break;
 		}
-	} else {
-		if (conf.last_shooted.size() == 1) {
-			std::uniform_int_distribution<unsigned int> dir(0, 3);
-
-			while (true) {
-				coords = conf.last_shooted[0];
-
-				switch(dir(gen)) {
-					case 0: /* Up */
-						if (coords.y == 0) continue;
-						coords.y = coords.y - 1;
-						break;
-					case 1: /* Right */
-						if (coords.x == GameField::columns - 1) continue;
-						coords.x = coords.x + 1;
-						break;
-					case 2: /* Down */
-						if (coords.y == GameField::rows - 1) continue;
-						coords.y = coords.y + 1;
-						break;
-					case 3: /* Left */
-						if (coords.x == 0) continue;
-						coords.x = coords.x - 1;
-						break;
-				}
-				if (fs.isShooted(coords)) {
-					continue;
-				}
-				break;
+	} else if (conf.last_shooted.size() == 1) {
+		auto dirs = numsInRandomOrder(0, 3);
+		for (auto d : dirs) {
+			coords = conf.last_shooted[0];
+			switch(d) {
+				case 0: /* Up */
+					if (coords.y == 0) continue;
+					coords.y = coords.y - 1;
+					break;
+				case 1: /* Right */
+					if (coords.x == GameField::columns - 1) continue;
+					coords.x = coords.x + 1;
+					break;
+				case 2: /* Down */
+					if (coords.y == GameField::rows - 1) continue;
+					coords.y = coords.y + 1;
+					break;
+				case 3: /* Left */
+					if (coords.x == 0) continue;
+					coords.x = coords.x - 1;
+					break;
 			}
-		} else {
-			std::uniform_int_distribution<unsigned int> dir(0, 1);
-			std::uniform_int_distribution<unsigned int> what_el(0, conf.last_shooted.size() - 1);
-			while (true) {
-				coords = conf.last_shooted[what_el(gen)];
-
-				auto coords1 = conf.last_shooted[0];
-				auto coords2 = conf.last_shooted[1];
-				auto d_coords = Coords({
-						(unsigned int) std::abs((int) coords2.x - (int) coords1.x),
-						(unsigned int) std::abs((int) coords2.y - (int) coords1.y)
-					});
-
-				unsigned int d_x = d_coords.x > 0 ? 1 : 0;
-				unsigned int d_y = d_coords.y > 0 ? 1 : 0;
-
-				switch(dir(gen)) {
+			if (fs.isShooted(coords)) {
+				continue;
+			}
+			break;
+		}
+	} else {
+		auto els = numsInRandomOrder(0, conf.last_shooted.size() - 1);
+		bool selected = false;
+		for (auto el : els) {
+			auto dirs = numsInRandomOrder(0, 1);
+			coords = conf.last_shooted[el];
+			auto coords1 = conf.last_shooted[0];
+			auto coords2 = conf.last_shooted[1];
+			unsigned int d_x = coords1.x == coords2.x ? 0 : 1;
+			unsigned int d_y = coords1.y == coords2.y ? 0 : 1;
+			for (auto d : dirs) {
+				switch(d) {
 					case 0: /* Inc */
-						if (coords.y == 0) continue;
-						coords.x = coords.x + d_x * 1;
-						coords.y = coords.y + d_y * 1;
+						if ((coords.x == GameField::columns - 1 && d_x > 0) ||
+								(coords.y == GameField::rows - 1 && d_y > 0)) break;
+						coords.x = coords.x + d_x;
+						coords.y = coords.y + d_y;
 						break;
 					case 1: /* Dec */
-						if (coords.x == GameField::columns - 1) continue;
-						coords.x = coords.x - d_x * 1;
-						coords.y = coords.y - d_y * 1;
+						if ((coords.x == 0 && d_x > 0) ||
+								(coords.y == 0 && d_y > 0)) break;
+						coords.x = coords.x - d_x;
+						coords.y = coords.y - d_y;
 						break;
 				}
-				if (fs.isShooted(coords)) {
-					continue;
-				}
-				break;
+				selected = !fs.isShooted(coords);
+				if (selected) break;
 			}
+			if (selected) break;
 		}
 	}
+
+	if (fs.isShooted(coords)) {
+		return autoShoot(conf, fs);
+	}
+
 	fs.selectCell(coords);
 	fs.shoot(coords);
 	for (auto &ship : fs.getShips()) {
