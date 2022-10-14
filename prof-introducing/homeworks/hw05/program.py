@@ -55,6 +55,12 @@ def make_vertical(x, min_y, max_y, *args, text='', **kwargs):
         plt.text(x, min_y - 0.1, text)
 
 
+def make_horizontal(min_x, max_x, y, *args, text='', **kwargs):
+    plt.plot([min_x, max_x], [y, y], *args, **kwargs)
+    if text != '':
+        plt.text(min_x - 0.1, y, text)
+
+
 def recursive_verticals(date1, date2, min_y, max_y, level, max_level, *args, **kwargs):
     half = date_half(date1, date2)
     make_vertical(half, min_y, max_y, *args, **kwargs)
@@ -68,24 +74,31 @@ def get_ln(data_col):
     return data_col.apply(lambda x: log(x) if x > 0 else 0)
 
 def main():
+    plt.style.use('seaborn-whitegrid')
+
     data = pd.read_csv('coal-production-by-country.csv')
     data[VALUE] = data['Coal production (TWh)']
     data[LN_VALUE] = get_ln(data[VALUE])
     data = data[data['Code'] == 'USA']
+    make_plot(data, lambda x: log(x), "ln(Coal production)", marker='.')
     data = data[data[YEAR] >= 1960]
     data[CUM_VALUE] = data[VALUE].cumsum()
     data[LN_CUM_VALUE] = get_ln(data[CUM_VALUE])
     data[PROD_DIV_SUM] = [v / s for v, s in zip(data[VALUE], data[CUM_VALUE])]
     data[LN_PROD_DIV_SUM] = [v / s for v, s in zip(data[LN_VALUE], data[LN_CUM_VALUE])]
 
-    plt.style.use('seaborn-whitegrid')
     make_plot(data, lambda x: x, "Coal production (TWh)", marker='.')
     make_plot(data, lambda x: log(x), "ln(Coal production)", marker='.')
-    make_plot(data, lambda x: x, "Coal", column_value=CUM_VALUE, marker='.')
-    make_plot(data, lambda x: log(x), "ln(Coal)", column_value=CUM_VALUE, marker='.')
-    make_plot(data, lambda x: x, "y' / y", column_value=PROD_DIV_SUM, marker='.')
-    make_plot(data, lambda x: x, "lny' / lny", column_value=LN_PROD_DIV_SUM, marker='.')
+    #make_plot(data, lambda x: x, "Coal", column_value=CUM_VALUE, marker='.')
+    #make_plot(data, lambda x: log(x), "ln(Coal)", column_value=CUM_VALUE, marker='.')
+    #make_plot(data, lambda x: x, "y' / y", column_value=PROD_DIV_SUM, marker='.')
+    #make_plot(data, lambda x: x, "lny' / lny", column_value=LN_PROD_DIV_SUM, marker='.')
     make_plot(data, lambda x: log(x), "ln(y' / y)", column_value=PROD_DIV_SUM, marker='.')
+
+    k = math.atan(-0.454545454)
+    k = math.atan(-1.304347826)
+    k = math.atan(-0.766666666)
+    make_horizontal(data[YEAR].min(), data[YEAR].max(), k)
 
     plt.show()
 
