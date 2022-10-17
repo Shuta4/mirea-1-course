@@ -1,0 +1,322 @@
+\documentclass[14pt, a4paper]{extreport}
+\usepackage{extsizes}
+\usepackage[a4paper, left=30mm, right=15mm, top=20mm, bottom=20mm]{geometry}
+\usepackage[english, russian]{babel}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures={TeX},Renderer=Basic}
+\setmainfont[Ligatures={TeX,Historic}]{Times New Roman}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{setspace}
+\graphicspath{{images/}}
+\usepackage[hidelinks]{hyperref}
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+\usepackage[explicit,compact]{titlesec}
+\usepackage{titletoc}
+\newcommand{\doublerule}[1][.4pt]{%
+	\noindent
+	\makebox[0pt][l]{\rule[.6ex]{\linewidth}{#1}}%
+	\rule[.3ex]{\linewidth}{#1}
+}
+
+\addto\captionsrussian{%
+	\renewcommand{\contentsname}%
+	{\centering{СОДЕРЖАНИЕ}}%
+}
+
+\usepackage{caption}
+\DeclareCaptionLabelSeparator{dash}{ -- }
+\DeclareCaptionLabelFormat{figure}{Рисунок #2}
+\captionsetup[table]{
+	labelsep=dash,
+	singlelinecheck=false,
+}
+\captionsetup[figure]{
+	labelsep=dash,
+	labelformat=figure,
+}
+
+\usepackage{floatrow}
+\floatsetup[table]{style=plaintop}
+\floatsetup[equation]{style=plain}
+
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{equation}{chapter}
+\counterwithout{table}{chapter}
+
+\usepackage{cleveref}
+\crefformat{table}{смотри табл.#2#1#3}
+\Crefformat{table}{Смотри табл.#2#1#3}
+
+\crefformat{figure}{рис.~#2#1#3}
+\Crefformat{figure}{Рис.~#2#1#3}
+\crefmultiformat{figure}{рис.~#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+\crefrangeformat{figure}{рис.~#3#1#4--#5#2#6}
+
+\crefformat{equation}{#1}
+\crefmultiformat{equation}{~#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+\crefrangeformat{equation}{~#3#1#4--#5#2#6}
+
+\begin{document}
+\begin{titlepage}
+	\begin{center}
+		\vspace*{0.5mm}
+		\setstretch{1.1}
+
+		\includegraphics[width=0.18\textwidth]{logo}\\
+		\footnotesize
+		МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+		\small
+		Федеральное государственное бюджетное образовательное учреждение высшего образования\\
+		\textbf{«МИРЭА - Российский технологический университет»}
+		\vspace{0.5cm}
+
+		\large \textbf{РТУ МИРЭА} \normalsize
+
+		\doublerule[1pt]\\
+		\vspace{0.4cm}
+
+		Институт искусственного интеллекта\\
+		Кафедра общей информатики
+		\vspace{1.5cm}
+
+		\textbf{ОТЧЕТ}\\
+		\textbf{ПО ПРАКТИЧЕСКОЙ РАБОТЕ № 6}\\
+		\textbf{построение комбинационных схем, реализующих МДНФ и МКНФ заданной логической функции от 4-х переменных в базисах И-НЕ, ИЛИ-НЕ}\\
+		\textbf{по дисциплине}\\
+		«ИНФОРМАТИКА»
+		\vspace{1.5cm}
+
+		\small
+		Выполнил студент группы ИМБО-01-22 \hfill Скирдин Никита Сергеевич
+		\vspace{1cm}
+
+		Принял \hfill Павлова Екатерина Сергеевна\\
+		ассистент \hfill
+		\vspace{1.5cm}
+
+		\footnotesize
+		\hspace{0.5cm} Практическая \hfill «\_\_»\_\_\_\_\_\_2022 г. \hfill Подпись студента\\
+		\hspace{0.5cm} работа выполнена \hfill
+		\vspace{0.5cm}
+
+		\hspace{2cm} «Зачтено» \hfill «\_\_»\_\_\_\_\_\_2022 г. \hfill Подпись преподавателя
+		\vfill
+
+		\small
+		Москва 2022
+	\end{center}
+	\thispagestyle{empty}
+\end{titlepage}
+
+\setstretch{1.5}
+\setcounter{page}{2}
+
+\titlecontents{chapter}[0em]
+	{\vskip 0.5ex}%
+	{\thecontentslabel \space \uppercase}% numbered sections formatting
+	{}% unnumbered sections formatting
+	{\hfill \thecontentspage}%
+
+\titlecontents{section}[1.25cm]
+	{\vskip 0.5ex}%
+	{\thecontentslabel \space}
+	{}
+	{\hfill \thecontentspage}
+
+\titleformat{\chapter}[block]
+	{\bfseries\normalsize}{}{0pt}{\uppercase{#1}}
+
+\titleformat{\section}[block]
+	{\bfseries\normalsize}{}{0pt}{#1}
+
+\titlespacing*{\chapter}{0pt}{-10.5mm}{0pt}
+
+\tableofcontents
+
+\titleformat{\chapter}[display]
+	{\centering\bfseries\normalsize}{}{0pt}{\thechapter \space \uppercase{#1}}
+
+\titleformat{\section}[block]
+	{\hspace{\parindent}\bfseries\normalsize}{}{0pt}{\thesection \space #1}
+
+\titlespacing*{\chapter}{0pt}{-19.5mm}{0pt}
+
+\chapter{Постановка задачи}
+Логическая функция от четырех переменных задана в 16-теричной векторной форме. Восстановить таблицу истинности. Минимизировать логическую функцию при помощи карт Карно и получить формулы МДНФ и МКНФ в общем базисе. Перевести МДНФ и МКНФ в базисы «И-НЕ» и «ИЛИ-НЕ» (каждую минимальную форму в два базиса). Построить комбинационные схемы для приведенных к базисам формул МДНФ и МКНФ в лабораторном комплексе, используя только логические элементы, входящие в конкретный базис. Протестировать работу схем и убедиться в их правильности. Подготовить отчет о проделанной работе и защитить ее.
+
+\section{Персональный вариант}
+Логическая функция от четырех переменных, заданная в 16-теричной форме: F9AA$_{16}$
+
+\chapter{Проектирование и реализация}
+\section{Предварительная подготовка данных}
+Преобразуем заданную логическую функцию в двоичную запись: 1111 1001 1010 1010$_2$ - получили столбец значений логической функции, который необходим для восстановления полной таблицы истинности (\cref{tab:function-values}).
+
+\begin{table}[!htbp]
+	\caption{Таблица истинности заданной функции}
+	\label{tab:function-values}
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		a & b & c & d & F \\
+		\hline
+		0 & 0 & 0 & 0 & 1 \\
+		\hline
+		0 & 0 & 0 & 1 & 1 \\
+		\hline
+		0 & 0 & 1 & 0 & 1 \\
+		\hline
+		0 & 0 & 1 & 1 & 1 \\
+		\hline
+		0 & 1 & 0 & 0 & 1 \\
+		\hline
+		0 & 1 & 0 & 1 & 0 \\
+		\hline
+		0 & 1 & 1 & 0 & 0 \\
+		\hline
+		0 & 1 & 1 & 1 & 1 \\
+		\hline
+		1 & 0 & 0 & 0 & 1 \\
+		\hline
+		1 & 0 & 0 & 1 & 0 \\
+		\hline
+		1 & 0 & 1 & 0 & 1 \\
+		\hline
+		1 & 0 & 1 & 1 & 0 \\
+		\hline
+		1 & 1 & 0 & 0 & 1 \\
+		\hline
+		1 & 1 & 0 & 1 & 0 \\
+		\hline
+		1 & 1 & 1 & 0 & 1 \\
+		\hline
+		1 & 1 & 1 & 1 & 0 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\section{Вывод формулы для МДНФ}
+Для построения МДНФ заданной функции воспользуемся методом карт Карно. Разместим единичные значения функции на карте Карно, предназначенной для минимизации функции от четырех переменных (\cref{fig:map-mdnf}).
+
+\begin{figure}[H]
+	\caption{Карта Карно, заполненная для построения МДНФ}
+	\label{fig:map-mdnf}
+	\includegraphics[width=0.5\textwidth]{map-mdnf}\\
+\end{figure}
+
+Теперь выделяем интервалы, на которых функция сохраняет свое единичное значение, результат выделения интервалов показан на \cref{fig:map-mdnf-selected}.
+
+\begin{figure}[H]
+	\caption{Результат выделения интервалов для МДНФ}
+	\label{fig:map-mdnf-selected}
+	\includegraphics[width=0.5\textwidth]{map-mdnf-selected}
+\end{figure}
+
+Далее запишем формулу МДНФ, для чего последовательно рассмотрим каждый из интервалов. Для каждого интервала запишем минимальную конъюнкцию, куда будут входить только те переменные и их отрицания, которые сохраняют свое значение на этом интервале. Переменные, которые меняют свое значение на интервале, упростятся. Чтобы получить МДНФ остается только объединить при помощи дизъюнкции имеющееся множество минимальных конъюнкций. В результате получим формулу \cref{equ:mdnf}.
+\begin{align}
+	\label{equ:mdnf}
+	F_\textup{МДНФ} = \bar{a} \cdot \bar{b} + \bar{c} \cdot \bar{d} + %
+					  \bar{a} \cdot c \cdot d + a \cdot c \cdot \bar{d}
+\end{align}
+
+Теперь приведем полученную МДНФ к базисам «И-НЕ» и «ИЛИ-НЕ», для чего воспользуемся законами де Моргана. В результате получим формулы \cref{equ:mdnf-and-not,equ:mdnf-or-not}.
+\begin{align}
+	\label{equ:mdnf-and-not}
+	F_{\textup{МДНФ}_\textup{и-не}} = \overline{%
+		\overline{\overline{a} \cdot \overline{b}} \cdot %
+		\overline{\overline{c} \cdot \overline{d}} \cdot %
+		\overline{\overline{a} \cdot c \cdot d} \cdot %
+		\overline{a \cdot c \cdot \overline{d}}%
+	}
+\end{align}
+\begin{align}
+	\label{equ:mdnf-or-not}
+	F_{\textup{МДНФ}_\textup{или-не}} = \overline{\overline{%
+		\overline{a + b} + \overline{c + d} + %
+		\overline{a + \overline{c} + \overline{d}} + %
+		\overline{\overline{a} + \overline{c} + d}
+	}}
+\end{align}
+
+\section{Вывод формулы для МКНФ}
+
+Для построения МКНФ заданной функции воспользуемся методом карт Карно. Разместим нулевые значения функции на карте Карно, предназначенной для минимизации функции от четырех переменных (\cref{fig:map-mknf}).
+
+\begin{figure}[H]
+	\caption{Карта Карно, заполненная для построения МКНФ}
+	\label{fig:map-mknf}
+	\includegraphics[width=0.5\textwidth]{map-mknf}
+\end{figure}
+
+Теперь выделяем интервалы, на которых функция сохраняет свое нулевое значение, результат выделения интервалов показан на \cref{fig:map-mknf-selected}.
+
+\begin{figure}[H]
+	\caption{Результат выделения интервалов для МКНФ}
+	\label{fig:map-mknf-selected}
+	\includegraphics[width=0.5\textwidth]{map-mknf-selected}
+\end{figure}
+
+Далее запишем формулу МКНФ, для чего последовательно рассмотрим каждый из интервалов. Для каждого интервала запишем минимальную дизъюнкцию, куда будут входить только те переменные и их отрицания, которые сохраняют свое значение на этом интервале. Переменные, которые меняют свое значение на интервале, упростятся. Чтобы получить МКНФ остается только объединить при помощи конъюнкции имеющееся множество минимальных дизъюнкций. В результате получим формулу \cref{equ:mknf}.
+\begin{align}
+	\label{equ:mknf}
+	F_\textup{МКНФ} = (\bar{a} + \bar{d}) \cdot (\bar{b} + c + \bar{d})%
+		\cdot (a + \bar{b} + \bar{c} + d)
+\end{align}
+
+Теперь приведем полученную МДНФ к базисам «И-НЕ» и «ИЛИ-НЕ», для чего воспользуемся законами де Моргана. В результате получим формулы \cref{equ:mknf-and-not,equ:mknf-or-not}.
+\begin{align}
+	\label{equ:mknf-and-not}
+	F_{\textup{МКНФ}_\textup{и-не}} = \overline{\overline{%
+		\overline{a \cdot d} \cdot%
+		\overline{b \cdot \overline{c} \cdot d} \cdot%
+		\overline{\overline{a} \cdot b \cdot c \cdot \overline{d}}%
+	}}
+\end{align}
+\begin{align}
+	\label{equ:mknf-or-not}
+	F_{\textup{МКНФ}_\textup{или-не}} = \overline{%
+		\overline{\overline{a} + \overline{d}} +%
+		\overline{\overline{b} + c + \overline{d}} +%
+		\overline{a + \overline{b} + \overline{c} + d}%
+	}
+\end{align}
+
+\section{Построение схем в лабораторном комплексе}
+Построим в лабораторном комплексе комбинационные схемы, реализующие МДНФ и МКНФ рассматриваемой функции в базисах «И-НЕ» и «ИЛИ-НЕ», протестируем их работу и убедимся в их правильности (\cref{fig:mdnf-and-not,fig:mdnf-or-not,fig:mknf-and-not,fig:mknf-or-not}).
+
+\begin{figure}[H]
+	\centering
+	\caption{Тестирование схемы МДНФ, построенной в базисе «И-НЕ»}
+	\label{fig:mdnf-and-not}
+	\includegraphics[width=\textwidth]{mdnf-and-not}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\caption{Тестирование схемы МДНФ, построенной в базисе «ИЛИ-НЕ»}
+	\label{fig:mdnf-or-not}
+	\includegraphics[width=\textwidth]{mdnf-or-not}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\caption{Тестирование схемы МКНФ, построенной в базисе «И-НЕ»}
+	\label{fig:mknf-and-not}
+	\includegraphics[width=\textwidth]{mknf-and-not}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\caption{Тестирование схемы МКНФ, построенной в базисе «ИЛИ-НЕ»}
+	\label{fig:mknf-or-not}
+	\includegraphics[width=\textwidth]{mknf-or-not}
+\end{figure}
+
+\chapter{Выводы}
+В ходе работы была восстановлена таблица истинности заданной логической функции от четырех переменных. Функция была минимизирована при помощи карт Карно, для нее были записаны формулы МДНФ и МКНФ в общем базисе. МДНФ и МКНФ были переведены в базисы «И-НЕ» и «ИЛИ-НЕ». В лабораторном комплексе были построены комбинационные схемы приведенных к базисам МДНФ и МКНФ с использованием элементов, входящих в конкретный базис. Работа схем была протестирована.
+
+\chapter{Информационный источник}
+\textbf{Смирнов, С. С.} Информатика : Методические указания по выполнению практических работ / С. С. Смирнов, Д. А. Карпов. -- Москва : МИРЭА -- Российский технологический университет, 2020. -- 102 с.
+
+\end{document}
