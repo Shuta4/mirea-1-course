@@ -1,0 +1,222 @@
+\documentclass[14pt, a4paper]{extreport}
+\usepackage{extsizes}
+\usepackage[a4paper, left=30mm, right=15mm, top=20mm, bottom=20mm]{geometry}
+\usepackage[english, russian]{babel}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures={TeX},Renderer=Basic}
+\setmainfont[Ligatures={TeX,Historic}]{Times New Roman}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{setspace}
+\graphicspath{{images/}}
+\usepackage[hidelinks]{hyperref}
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+\usepackage[explicit,compact]{titlesec}
+\usepackage{titletoc}
+\newcommand{\doublerule}[1][.4pt]{%
+	\noindent
+	\makebox[0pt][l]{\rule[.6ex]{\linewidth}{#1}}%
+	\rule[.3ex]{\linewidth}{#1}
+}
+
+\addto\captionsrussian{%
+	\renewcommand{\contentsname}%
+	{\centering{СОДЕРЖАНИЕ}}%
+}
+
+\usepackage{caption}
+\DeclareCaptionLabelSeparator{dash}{ -- }
+\DeclareCaptionLabelFormat{figure}{Рисунок #2}
+\captionsetup[table]{
+	labelsep=dash,
+	singlelinecheck=false,
+}
+\captionsetup[figure]{
+	labelsep=dash,
+	labelformat=figure,
+}
+
+\usepackage{floatrow}
+\floatsetup[table]{style=plaintop}
+\floatsetup[equation]{style=plain}
+
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{equation}{chapter}
+\counterwithout{table}{chapter}
+
+\usepackage{cleveref}
+\crefformat{table}{смотри табл.#2#1#3}
+\Crefformat{table}{Смотри табл.#2#1#3}
+
+\crefformat{figure}{рис.~#2#1#3}
+\Crefformat{figure}{Рис.~#2#1#3}
+\crefmultiformat{figure}{рис.~#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+\crefrangeformat{figure}{рис.~#3#1#4--#5#2#6}
+
+\crefformat{equation}{#1}
+\crefmultiformat{equation}{~#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+\crefrangeformat{equation}{~#3#1#4--#5#2#6}
+
+\begin{document}
+\begin{titlepage}
+	\begin{center}
+		\vspace*{0.5mm}
+		\setstretch{1.1}
+
+		\includegraphics[width=0.18\textwidth]{logo}\\
+		\footnotesize
+		МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+		\small
+		Федеральное государственное бюджетное образовательное учреждение высшего образования\\
+		\textbf{«МИРЭА - Российский технологический университет»}
+		\vspace{0.5cm}
+
+		\large \textbf{РТУ МИРЭА} \normalsize
+
+		\doublerule[1pt]\\
+		\vspace{0.4cm}
+
+		Институт искусственного интеллекта\\
+		Кафедра общей информатики
+		\vspace{1.5cm}
+
+		\textbf{ОТЧЕТ}\\
+		\textbf{ПО ПРАКТИЧЕСКОЙ РАБОТЕ № 9}\\
+		\textbf{преобразователи кодов}\\
+		\textbf{по дисциплине}\\
+		«ИНФОРМАТИКА»
+		\vspace{1.5cm}
+
+		\small
+		Выполнил студент группы ИМБО-01-22 \hfill Скирдин Никита Сергеевич
+		\vspace{1cm}
+
+		Принял \hfill Павлова Екатерина Сергеевна\\
+		ассистент \hfill
+		\vspace{1.5cm}
+
+		\footnotesize
+		\hspace{0.5cm} Практическая \hfill «\_\_»\_\_\_\_\_\_2022 г. \hfill Подпись студента\\
+		\hspace{0.5cm} работа выполнена \hfill
+		\vspace{0.5cm}
+
+		\hspace{2cm} «Зачтено» \hfill «\_\_»\_\_\_\_\_\_2022 г. \hfill Подпись преподавателя
+		\vfill
+
+		\small
+		Москва 2022
+	\end{center}
+	\thispagestyle{empty}
+\end{titlepage}
+
+\setstretch{1.5}
+\setcounter{page}{2}
+
+\titlecontents{chapter}[0em]
+	{\vskip 0.5ex}%
+	{\thecontentslabel \space \uppercase}% numbered sections formatting
+	{}% unnumbered sections formatting
+	{\hfill \thecontentspage}%
+
+\titlecontents{section}[1.25cm]
+	{\vskip 0.5ex}%
+	{\thecontentslabel \space}
+	{}
+	{\hfill \thecontentspage}
+
+\titleformat{\chapter}[block]
+	{\bfseries\normalsize}{}{0pt}{\uppercase{#1}}
+
+\titleformat{\section}[block]
+	{\bfseries\normalsize}{}{0pt}{#1}
+
+\titlespacing*{\chapter}{0pt}{-10.5mm}{0pt}
+
+\tableofcontents
+
+\titleformat{\chapter}[display]
+	{\centering\bfseries\normalsize}{}{0pt}{\thechapter \space \uppercase{#1}}
+
+\titleformat{\section}[block]
+	{\hspace{\parindent}\bfseries\normalsize}{}{0pt}{\thesection \space #1}
+
+\titlespacing*{\chapter}{0pt}{-19.5mm}{0pt}
+
+\chapter{Постановка задачи}
+Таблица переходов для преобразователя кодов задана как совокупность четырех логических функций от четырех переменных в 16-теричной векторной форме. Иначе говоря, код, формируемый для некоторого входного набора, образуется как совокупность значений четырех функций для этого набора. Первая задаваемая функция описывает множество старших битов (третий разряд) для всех формируемых кодов, вторая функция описывает второй разряд, третья функция – первый разряд, и четвертая – нулевой. Восстановить таблицу переходов. По таблице переходов реализовать в лабораторном комплексе преобразователь кодов на основе дешифратора, шифратора и дополнительной логики «или».
+
+Протестировать работу схемы и убедиться в ее правильности. Подготовить отчет о проделанной работе и защитить ее.
+
+\section{Персональный вариант}
+Логические функции от четырех переменных, заданные в 16-теричной форме: $F_{1} = F9AA_{16}$, $F_{2} = 3D3E_{16}$, $F_{3} = 75B9_{16}$, $F_{4} = 95F9_{16}$.
+
+\chapter{Проектирование и реализация}
+\section{Предварительная подготовка данных}
+Преобразуем заданные логические функции в двоичную запись и восстановим таблицу истинности (\cref{tab:function-values}).
+
+\begin{table}[!htbp]
+	\caption{Таблица истинности заданных функций}
+	\label{tab:function-values}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\hline
+		a & b & c & d & F1 & F2 & F3 & F4 \\
+		\hline
+		0 & 0 & 0 & 0 & 1  & 0  & 0  & 1  \\
+		\hline
+		0 & 0 & 0 & 1 & 1  & 0  & 1  & 0  \\
+		\hline
+		0 & 0 & 1 & 0 & 1  & 1  & 1  & 0  \\
+		\hline
+		0 & 0 & 1 & 1 & 1  & 1  & 1  & 1  \\
+		\hline
+		0 & 1 & 0 & 0 & 1  & 1  & 0  & 0  \\
+		\hline
+		0 & 1 & 0 & 1 & 0  & 1  & 1  & 1  \\
+		\hline
+		0 & 1 & 1 & 0 & 0  & 0  & 0  & 0  \\
+		\hline
+		0 & 1 & 1 & 1 & 1  & 1  & 1  & 1  \\
+		\hline
+		1 & 0 & 0 & 0 & 1  & 0  & 1  & 1  \\
+		\hline
+		1 & 0 & 0 & 1 & 0  & 0  & 0  & 1  \\
+		\hline
+		1 & 0 & 1 & 0 & 1  & 1  & 1  & 1  \\
+		\hline
+		1 & 0 & 1 & 1 & 0  & 1  & 1  & 1  \\
+		\hline
+		1 & 1 & 0 & 0 & 1  & 1  & 1  & 1  \\
+		\hline
+		1 & 1 & 0 & 1 & 0  & 1  & 0  & 0  \\
+		\hline
+		1 & 1 & 1 & 0 & 1  & 1  & 0  & 0  \\
+		\hline
+		1 & 1 & 1 & 1 & 0  & 0  & 1  & 1  \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\section{Реализация преобразователя кодов}
+Схема устройства строится непосредственно по таблице. Значения переменных «a», «b», «c», «d» указывают на номер выхода дешифратора, который необходимо подключить к некоторому входу шифратора. Номер входа шифратора определяется кодом из правой части таблицы истинности, который должен быть сформирован для данного входного набора значений переменных.
+
+Если для нескольких разных наборов значений переменных должны быть получены одинаковые коды, то соответствующие выходы дешифратора объединяются через «или», а выход «или» уже подается на вход шифратора.
+
+В результате получим схему, показанную на \cref{fig:code}.
+
+\begin{figure}[H]
+	\caption{Тестирование преобразователя кодов}
+	\label{fig:code}
+	\includegraphics[width=\textwidth]{code}
+\end{figure}
+
+\chapter{Выводы}
+В ходе работы была восстановлена таблица переходов для четырех логических функций от четырех переменных. По таблице переходов в лабораторном комплексе был реализован преобразователь кодов на основе дешифратора, шифратора и дополнительной логики «или».
+
+Работа схемы была протестирована, чтобы убедиться в правильности ее работы.
+
+\chapter{Информационный источник}
+\textbf{Смирнов, С. С.} Информатика : Методические указания по выполнению практических работ / С. С. Смирнов, Д. А. Карпов. -- Москва : МИРЭА -- Российский технологический университет, 2020. -- 102 с.
+
+\end{document}
