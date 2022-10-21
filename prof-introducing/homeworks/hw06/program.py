@@ -78,12 +78,16 @@ def main():
 
     data = pd.read_csv('coal-production-by-country.csv')
     data[VALUE] = data['Coal production (TWh)']
-    data[LN_VALUE] = get_ln(data[VALUE])
     data = data[data['Code'] == 'USA']
+    data[LN_VALUE] = get_ln(data[VALUE])
     make_plot(data, "ln(Coal production)", column_y=LN_VALUE, marker='.')
-    data = data[data[YEAR] >= 1960]
+    data = data[data[YEAR] >= 1994]
+    data = data[data[YEAR] <= 2020]
     data = data.reset_index(drop=True)
-    data = data.iloc[::-1]
+    for i in range(13):
+        data.loc[i, VALUE] = data.iloc[-i - 1][VALUE]
+        data.loc[i, LN_VALUE] = data.iloc[-i - 1][LN_VALUE]
+
     data[CUM_VALUE] = data[VALUE].cumsum()
     data[LN_CUM_VALUE] = get_ln(data[CUM_VALUE])
     data[PROD_DIV_SUM] = [v / s for v, s in zip(data[VALUE], data[CUM_VALUE])]
@@ -91,23 +95,29 @@ def main():
 
     make_plot(data, "Coal production (TWh)", marker='.')
     make_plot(data, "Coal production", column_y=LN_VALUE, ylabel='ln(y)', marker='.')
-    plt.xlim(data[YEAR].max(), data[YEAR].min())
+    make_plot(data, "Coal", column_y=LN_CUM_VALUE, ylabel="ln(y)", marker='.')
 
-    make_plot(data, "Anamorphose", column_y=LN_PROD_DIV_SUM, ylabel="ln(y' / y)", marker='.')
-    plt.xlim(data[YEAR].max(), data[YEAR].min())
-    plt.plot(
-            [data.iloc[5][YEAR], data.iloc[-1][YEAR]],
-            [data.iloc[5][LN_PROD_DIV_SUM], data.iloc[-1][LN_PROD_DIV_SUM]],
-            color='orange')
+    make_plot(data, "Logistics", column_y=LN_PROD_DIV_SUM, column_x=CUM_VALUE,
+              ylabel="ln(y' / y)", xlabel="y", marker='.')
 
+    logistics_x1 = data[CUM_VALUE].min()
+    logistics_x2 = data[CUM_VALUE].max()
+    logistics_y1 = data[LN_PROD_DIV_SUM].max()
+    logistics_y2 = data[LN_PROD_DIV_SUM].min()
 
-    make_plot(data, "Logistics", column_y=LN_PROD_DIV_SUM, column_x=LN_CUM_VALUE, ylabel="ln(y' / y)", xlabel="ln(y)", marker='.')
+    plt.plot([logistics_x1, logistics_x2],
+             [logistics_y1, logistics_y2], color='orange')
 
-    plt.plot(
-            [data[LN_CUM_VALUE].min(), data[LN_CUM_VALUE].max()],
-            [data[LN_PROD_DIV_SUM].max(), data[LN_PROD_DIV_SUM].min()],
-            color='orange')
+    make_plot(data, "Logistics", column_y=LN_PROD_DIV_SUM, column_x=LN_CUM_VALUE,
+              ylabel="ln(y' / y)", xlabel="ln(y)", marker='.')
 
+    ln_logistics_x1 = data[LN_CUM_VALUE].min()
+    ln_logistics_x2 = data[LN_CUM_VALUE].max()
+    ln_logistics_y1 = data[LN_PROD_DIV_SUM].max()
+    ln_logistics_y2 = data[LN_PROD_DIV_SUM].min()
+
+    plt.plot([ln_logistics_x1, ln_logistics_x2],
+             [ln_logistics_y1, ln_logistics_y2], color='orange')
 
     plt.show()
 
