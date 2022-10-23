@@ -224,7 +224,7 @@
 \begin{align}
 	\label{equ:mdnf}
 	F_\textup{МДНФ} = \bar{a} \cdot \bar{b} + \bar{c} \cdot \bar{d} + %
-					  \bar{a} \cdot c \cdot d + a \cdot c \cdot \bar{d}
+					  \bar{a} \cdot c \cdot d + a \cdot \bar{d}
 \end{align}
 
 Теперь приведем полученную МДНФ к базисам «И-НЕ» и «ИЛИ-НЕ», для чего воспользуемся законами де Моргана. В результате получим формулы \cref{equ:mdnf-and-not,equ:mdnf-or-not}.
@@ -234,7 +234,7 @@
 		\overline{\overline{a} \cdot \overline{b}} \cdot %
 		\overline{\overline{c} \cdot \overline{d}} \cdot %
 		\overline{\overline{a} \cdot c \cdot d} \cdot %
-		\overline{a \cdot c \cdot \overline{d}}%
+		\overline{a \cdot \overline{d}}%
 	}
 \end{align}
 \begin{align}
@@ -242,7 +242,7 @@
 	F_{\textup{МДНФ}_\textup{или-не}} = \overline{\overline{%
 		\overline{a + b} + \overline{c + d} + %
 		\overline{a + \overline{c} + \overline{d}} + %
-		\overline{\overline{a} + \overline{c} + d}
+		\overline{\overline{a} + d}
 	}}
 \end{align}
 
