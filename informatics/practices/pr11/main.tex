@@ -1,0 +1,228 @@
+\documentclass[14pt, a4paper]{extreport}
+\usepackage{extsizes}
+\usepackage[a4paper, left=30mm, right=15mm, top=20mm, bottom=20mm]{geometry}
+\usepackage[english, russian]{babel}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures={TeX},Renderer=Basic}
+\setmainfont[Ligatures={TeX,Historic}]{Times New Roman}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{setspace}
+\graphicspath{{images/}}
+\usepackage[hidelinks]{hyperref}
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+\usepackage[explicit,compact]{titlesec}
+\usepackage{titletoc}
+\newcommand{\doublerule}[1][.4pt]{%
+	\noindent
+	\makebox[0pt][l]{\rule[.6ex]{\linewidth}{#1}}%
+	\rule[.3ex]{\linewidth}{#1}
+}
+
+\addto\captionsrussian{%
+	\renewcommand{\contentsname}%
+	{\centering{СОДЕРЖАНИЕ}}%
+}
+
+\usepackage{caption}
+\DeclareCaptionLabelSeparator{dash}{ -- }
+\DeclareCaptionLabelFormat{figure}{Рисунок #2}
+\captionsetup[table]{
+	labelsep=dash,
+	singlelinecheck=false,
+}
+\captionsetup[figure]{
+	labelsep=dash,
+	labelformat=figure,
+}
+
+\usepackage{floatrow}
+\floatsetup[table]{style=plaintop}
+\floatsetup[equation]{style=plain}
+
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{equation}{chapter}
+\counterwithout{table}{chapter}
+
+\usepackage{cleveref}
+\crefformat{table}{смотри табл.#2#1#3}
+\Crefformat{table}{Смотри табл.#2#1#3}
+
+\crefformat{figure}{рис.~#2#1#3}
+\Crefformat{figure}{Рис.~#2#1#3}
+\crefmultiformat{figure}{рис.~#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+\crefrangeformat{figure}{рис.~#3#1#4--#5#2#6}
+
+\crefformat{equation}{#1}
+\crefmultiformat{equation}{~#2#1#3}{,~#2#1#3}{,~#2#1#3}{,~#2#1#3}
+\crefrangeformat{equation}{~#3#1#4--#5#2#6}
+
+\begin{document}
+\begin{titlepage}
+	\begin{center}
+		\vspace*{0.5mm}
+		\setstretch{1.1}
+
+		\includegraphics[width=0.18\textwidth]{logo}\\
+		\footnotesize
+		МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+		\small
+		Федеральное государственное бюджетное образовательное учреждение высшего образования\\
+		\textbf{«МИРЭА - Российский технологический университет»}
+		\vspace{0.5cm}
+
+		\large \textbf{РТУ МИРЭА} \normalsize
+
+		\doublerule[1pt]\\
+		\vspace{0.4cm}
+
+		Институт искусственного интеллекта\\
+		Кафедра общей информатики
+		\vspace{1.5cm}
+
+		\textbf{ОТЧЕТ}\\
+		\textbf{ПО ПРАКТИЧЕСКОЙ РАБОТЕ № 11}\\
+		\textbf{синтез четырехразрядного счетчика с параллельным переносом между разрядами двумя способами}\\
+		\textbf{по дисциплине}\\
+		«ИНФОРМАТИКА»
+		\vspace{1.5cm}
+
+		\small
+		Выполнил студент группы ИМБО-01-22 \hfill Скирдин Никита Сергеевич
+		\vspace{1cm}
+
+		Принял \hfill Павлова Екатерина Сергеевна\\
+		ассистент \hfill
+		\vspace{1.5cm}
+
+		\footnotesize
+		\hspace{0.5cm} Практическая \hfill «\_\_»\_\_\_\_\_\_2022 г. \hfill Подпись студента\\
+		\hspace{0.5cm} работа выполнена \hfill
+		\vspace{0.5cm}
+
+		\hspace{2cm} «Зачтено» \hfill «\_\_»\_\_\_\_\_\_2022 г. \hfill Подпись преподавателя
+		\vfill
+
+		\small
+		Москва 2022
+	\end{center}
+	\thispagestyle{empty}
+\end{titlepage}
+
+\setstretch{1.5}
+\setlength{\abovedisplayskip}{0.1em}
+\setlength{\belowdisplayskip}{0.1em}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+\setlength{\floatsep}{1em}
+\setlength{\textfloatsep}{1em}
+\setlength{\intextsep}{1em}
+\setcounter{page}{2}
+
+\titlecontents{chapter}[0em]
+	{\vskip 0.5ex}%
+	{\thecontentslabel \space \uppercase}% numbered sections formatting
+	{}% unnumbered sections formatting
+	{\hfill \thecontentspage}%
+
+\titlecontents{section}[1.25cm]
+	{\vskip 0.5ex}%
+	{\thecontentslabel \space}
+	{}
+	{\hfill \thecontentspage}
+
+\titleformat{\chapter}[block]
+	{\bfseries\normalsize}{}{0pt}{\uppercase{#1}}
+
+\titleformat{\section}[block]
+	{\bfseries\normalsize}{}{0pt}{#1}
+
+\titlespacing*{\chapter}{0pt}{-10.5mm}{0pt}
+
+\tableofcontents
+
+\titleformat{\chapter}[display]
+	{\centering\bfseries\normalsize}{}{0pt}{\thechapter \space \uppercase{#1}}
+
+\titleformat{\section}[block]
+	{\hspace{\parindent}\bfseries\normalsize}{}{0pt}{\thesection \space #1}
+
+\titlespacing*{\chapter}{0pt}{-19.5mm}{0pt}
+
+\chapter{Постановка задачи}
+Разработать счетчик с параллельным переносом на D-триггерах двумя способами:
+
+- с оптимальной схемой управления, выполненной на логических элементах общего базиса;
+
+- со схемой управления, реализованной на преобразователе кодов (быстрая реализация, но не оптимальная схема).
+
+Протестировать работу схемы и убедиться в ее правильности. Подготовить отчет о проделанной работе и защитить ее.
+
+\section{Персональный вариант}
+Исходные данные:
+
+- направление счета - вычитание;
+- максимальное значение счетчика - 9;
+- шаг счета - 6;
+
+\chapter{Проектирование и реализация}
+\section{Предварительная подготовка данных}
+По исходным данным восстановим таблицу переходов счетчика (\cref{tab:states}).
+
+\begin{table}[H]
+	\caption{Таблица переходов счетчика}
+	\label{tab:states}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\hline
+		$Q_3(t)$ & $Q_2(t)$ & $Q_1(t)$ & $Q_0(t)$ & $Q_3(t + 1)$ & $Q_2(t + 1)$ & $Q_1(t + 1)$ & $Q_0(t + 1)$ \\
+		\hline
+		0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+		\hline
+		0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 \\
+		\hline
+		0 & 0 & 1 & 0 & 0 & 1 & 1 & 0 \\
+		\hline
+		0 & 0 & 1 & 1 & 0 & 1 & 1 & 1 \\
+		\hline
+		0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 \\
+		\hline
+		0 & 1 & 0 & 1 & 1 & 0 & 0 & 1 \\
+		\hline
+		0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+		\hline
+		0 & 1 & 1 & 1 & 0 & 0 & 0 & 1 \\
+		\hline
+		1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+		\hline
+		1 & 0 & 0 & 1 & 0 & 0 & 1 & 1 \\
+		\hline
+		1 & 0 & 1 & 0 & * & * & * & * \\
+		\hline
+		1 & 0 & 1 & 1 & * & * & * & * \\
+		\hline
+		1 & 1 & 0 & 0 & * & * & * & * \\
+		\hline
+		1 & 1 & 0 & 1 & * & * & * & * \\
+		\hline
+		1 & 1 & 1 & 0 & * & * & * & * \\
+		\hline
+		1 & 1 & 1 & 1 & * & * & * & * \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+	\caption{Тестирование преобразователя кодов}
+	\label{fig:code}
+	\includegraphics[width=\textwidth]{logo}
+\end{figure}
+
+\chapter{Выводы}
+В ходе работы был разработан счетчик с параллельным переносом на D-триггерах двумя способами. Работа схем была протестирована, чтобы убедиться в их правильности.
+
+\chapter{Информационный источник}
+\textbf{Смирнов, С. С.} Информатика : Методические указания по выполнению практических работ / С. С. Смирнов, Д. А. Карпов. -- Москва : МИРЭА -- Российский технологический университет, 2020. -- 102 с.
+
+\end{document}
