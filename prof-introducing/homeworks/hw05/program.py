@@ -76,7 +76,7 @@ def get_ln(data_col):
 def main():
     plt.style.use('seaborn-whitegrid')
 
-    data = pd.read_csv('coal-production-by-country.csv')
+    data = pd.read_csv('../coal-production-by-country.csv')
     data[VALUE] = data['Coal production (TWh)']
     data[LN_VALUE] = get_ln(data[VALUE])
     data = data[data['Code'] == 'USA']
