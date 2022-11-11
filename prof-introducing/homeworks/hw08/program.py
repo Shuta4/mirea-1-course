@@ -68,9 +68,9 @@ def recursive_verticals(date1, date2, min_y, max_y, level, max_level, *args, **k
     recursive_verticals(date2, half, min_y, max_y, level + 1, max_level, *args, **kwargs)
 
 
-def normal_distribution(values, mu, sigma):
+def normal_distribution(values, mu, sigma, mult=1):
     return [1 / (sigma * (2 * math.pi) ** 0.5)
-            * math.e ** (-0.5 * ((x - mu) / sigma) ** 2)
+            * math.e ** (-0.5 * ((x - mu) / sigma) ** 2) * mult
             for x in values]
 
 
@@ -81,10 +81,10 @@ def ln_normal_distribution(values, mu, sigma):
     return (x_minus_mu_power_2, y)
 
 
-def plot_normal_distribution(mu, sigma):
+def plot_normal_distribution(mu, sigma, mult=1):
     x = np.linspace(mu - 3 * sigma, mu + 3 * sigma, 100)
     plt.figure()
-    plt.plot(x, normal_distribution(x, mu, sigma))
+    plt.plot(x, normal_distribution(x, mu, sigma, mult))
     plt.title('Normal Distribution')
 
 
@@ -115,17 +115,23 @@ def main():
     t = 5
     size = data.index.size
 
-    data[R] = [data.loc[i - t, VALUE] * data.loc[i + t, VALUE] / data.loc[i, VALUE] ** 2 if t <= i and i < size - t else None for i in range(size)]
+    data[R] = [data.loc[i - t, VALUE] * data.loc[i + t, VALUE] / data.loc[i, VALUE] ** 2
+               if t <= i and i < size - t else None for i in range(size)]
 
     make_plot(data, "R", column_y=R, marker='.')
 
     plt.figure()
     plt.hist(data[R], orientation='horizontal', bins=20)
+    plt.title('Histogram')
 
-    mu = data[VALUE].median()
-    sigma = 0.2
+    mu = data[R].mean()
+    sigma = 0.13
     plot_normal_distribution(mu, sigma)
     plot_ln_normal_distribution(mu, sigma)
+
+    plot_normal_distribution(mu - 0.03, sigma, 9.2)
+    plt.hist(data[R], bins=20)
+    plt.title('Normal distribution with histogram')
 
     plt.show()
 
