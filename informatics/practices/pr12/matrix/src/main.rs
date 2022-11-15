@@ -1,36 +1,41 @@
 extern crate core;
 use std::io;
+use std::io::Write;
 use rand::Rng;
 
 fn main() {
-    let mut matrix = [[0u8; 8]; 8];
+    let mut matrix = [[1u8; 8]; 8];
     let mut rng = rand::thread_rng();
 
+    println!("Matrix board filled with random numbers:");
     for i in &mut matrix {
         for j in &mut *i {
             *j = rng.gen_range(1..=100);
         }
+        println!("{:?}", i)
     }
+    println!();
 
     let color = loop {
         let mut input = String::new();
+        print!("Enter color of board cells (White or Black) >> ");
+        let flush_result = io::stdout().flush();
+        if let Err(err) = flush_result {
+            panic!("Can not flush stdout: {:?}", err);
+        }
+
         io::stdin()
             .read_line(&mut input)
-            .expect("Failed to read line");
+            .expect("Failed to read line.");
         let input = input.trim().to_lowercase();
 
         if input.eq("white") || input.eq("w") {
-            break Some(Color::White);
+            break Color::White;
         }
-        else if input.eq("black") || input.eq("b") {
-            break Some(Color::Black);
+        if input.eq("black") || input.eq("b") {
+            break Color::Black;
         }
-        println!("{input} {}", input.eq("w"))
-    };
-
-    let color = match color {
-        Some(color) => color,
-        None => panic!(),
+        println!("Bad input, please, enter White or Black.");
     };
 
     let mut result = [0u8; 32];

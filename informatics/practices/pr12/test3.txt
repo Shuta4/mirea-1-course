@@ -1,0 +1,17 @@
+Matrix board filled with random numbers:
+[3, 91, 88, 92, 39, 39, 15, 74]
+[78, 9, 40, 31, 20, 72, 66, 37]
+[18, 100, 97, 96, 5, 49, 77, 66]
+[39, 45, 18, 95, 31, 72, 46, 63]
+[76, 60, 86, 81, 17, 44, 28, 56]
+[63, 45, 94, 95, 5, 43, 22, 58]
+[84, 91, 9, 95, 47, 36, 89, 51]
+[6, 2, 27, 32, 78, 63, 63, 31]
+
+Enter color of board cells (White or Black) >> 1230
+Bad input, please, enter White or Black.
+Enter color of board cells (White or Black) >> d
+Bad input, please, enter White or Black.
+Enter color of board cells (White or Black) >> w
+[2, 3, 5, 9, 9, 15, 17, 18, 28, 31, 31, 32, 37, 39, 43, 45, 45, 47, 58, 63,
+63, 72, 72, 76, 77, 84, 86, 88, 89, 95, 95, 97]
