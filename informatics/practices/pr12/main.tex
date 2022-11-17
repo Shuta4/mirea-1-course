@@ -71,7 +71,7 @@
 \Crefname{listing}{Листингом}{Листингами}
 \crefrangeformat{listing}{листингами~#3#1#4--#5#2#6}
 
-\setmonofont{Courier New}[Scale=0.857]
+\setmonofont{Courier New}
 \lstset{basicstyle=\small\ttfamily}
 
 \begin{document}
@@ -187,7 +187,7 @@
 \begin{figure}[H]
 	\caption{Блок-схема программы, часть 2}
 	\label{fig:scheme-main-part2}
-	\includegraphics[width=0.55\textwidth]{scheme-main-part2}
+	\includegraphics[width=0.6\textwidth]{scheme-main-part2}
 \end{figure}
 
 \begin{figure}[H]
@@ -211,9 +211,9 @@
 \section{Примеры тестирования}
 Было проведено тестирование программы, которое показало, что программа работает корректно. Результаты тестирования представлены \cref{lst:test1,lst:test2,lst:test3}.
 \setstretch{1}
-\lstinputlisting[caption={Тестирование черных клеток},label=lst:test1]{test1.txt}
-\lstinputlisting[caption={Тестирование белых клеток},label=lst:test2]{test2.txt}
-\lstinputlisting[caption={Тестирование обработки некорректного ввода},label=lst:test3]{test3.txt}
+\lstinputlisting[breaklines=true,breakatwhitespace=true,caption={Тестирование черных клеток},label=lst:test1]{test1.txt}
+\lstinputlisting[breaklines=true,breakatwhitespace=true,caption={Тестирование белых клеток},label=lst:test2]{test2.txt}
+\lstinputlisting[breaklines=true,breakatwhitespace=true,caption={Тестирование обработки некорректного ввода},label=lst:test3]{test3.txt}
 \setstretch{1.5}
 
 \chapter{Выводы}
