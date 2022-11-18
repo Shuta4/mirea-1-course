@@ -112,13 +112,16 @@ def main():
     make_plot(data, "Coal production (TWh)", marker='.')
     make_plot(data, "Coal production", column_y=LN_VALUE, ylabel='ln(y)', marker='.')
 
+    n = data.index.size
     shifting_results = []
-    size = data.index.size
-    for t in range(0, int(size / 2 - 1)):
-        data[R] = [log(data.loc[i - t, VALUE] * data.loc[i + t, VALUE] / data.loc[i, VALUE] ** 2)
-               if t <= i and i < size - t else None for i in range(size)]
+    for t in range(n):
+        r = [log(data.loc[i - t, VALUE] * data.loc[i + t, VALUE] /
+             data.loc[i, VALUE] ** 2) for i in range(t, n - t)]
 
-        shifting_results += [data[R].mean()]
+        if len(r) == 0:
+            continue
+
+        shifting_results += [sum(r) / len(r)]
 
     x, y = zip(*[(i, v) for i, v in enumerate(shifting_results)])
 
@@ -127,6 +130,21 @@ def main():
     plt.xlabel('t')
     plt.ylabel('mean R')
     plt.title('Shift function')
+
+    shifting_results = []
+    for t in range(n):
+        s = sum(abs(data.loc[i + t, VALUE] - data.loc[i, VALUE]) for i in range(n - t))
+
+        shifting_results += [s / (n - t)]
+
+    x, y = zip(*[(i, v) for i, v in enumerate(shifting_results)])
+
+    plt.figure()
+    plt.plot(x, y, marker='.')
+    plt.xlabel('t')
+    plt.ylabel('(sum(abs(f(i + t) - f(i)) / (n - t)')
+    plt.title('Jevons')
+
     plt.show()
 
 
