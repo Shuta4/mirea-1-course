@@ -1,0 +1,98 @@
+// DISCLAIMER: из-за непонятного ограничения на кол-во загружаемых файлов пришлось загрузить ДЗ одним файлом.
+
+// branching.cpp
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char *argv[])
+{
+	float x, a;
+	std::cout << "Enter x and a: ";
+	std::cin >> x >> a;
+
+	if (std::abs(x) < 1) {
+		std::cout << "w = " << a * std::log(std::abs(x)) << '\n';
+	} else if (x * x > a) {
+		std::cout << "Can not compute square root\n";
+	} else {
+		std::cout << "w = " << std::sqrt(a - x * x) << '\n';
+	}
+}
+
+// cone.cpp
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char *argv[])
+{
+	float R, r, h;
+	std::cout << "Find V and S of truncated cone\n";
+	std::cout << "Enter R, r and h: ";
+	std::cin >> R >> r >> h;
+
+	if (R <= 0 || r <= 0 || h <= 0) {
+		std::cout << "All entered values should be greater then 0\n";
+	} else {
+		std::cout << "V = " << 1.0 / 3.0 * M_PI * h * (R * R + R * r + r * r)
+			<< "; S = " << M_PI * (R * R + (R + r) *
+					std::sqrt((R - r) * (R - r) + h * h) + r * r) << '\n';
+	}
+}
+
+// function.cpp
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char *argv[])
+{
+	float x, y, b;
+	std::cout << "z = ln(b - y) * sqrt(b - x)\n";
+	std::cout << "Enter x, y and b: ";
+	std::cin >> x >> y >> b;
+
+	if (b - y <= 0) {
+		std::cout << "Can not compute ln\n";
+	} else if (b - x < 0) {
+		std::cout << "Can not compute sqrt\n";
+	} else {
+		std::cout << "z = " << std::log(b - y) * std::sqrt(b - x) << '\n';
+	}
+}
+
+// order.cpp
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char *argv[])
+{
+	float n;
+	int start;
+	std::cout << "Enter N: ";
+	std::cin >> n;
+
+	if (n < 0) {
+		start = 1;
+	} else {
+		start = n + 1;
+	}
+
+	for (int i = start; i < start + 10; i++) {
+		std::cout << i << '\n';
+	}
+}
+
+// tabulation.cpp
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char *argv[])
+{
+	for (float x = -4; x <= 4; x = x + 0.5) {
+		std::cout << "x = " << x << ": ";
+		if (x - 1 == 0) {
+			std::cout << "division by 0\n";
+		} else {
+			std::cout << "y = " << (x * x - 2 * x + 2) / (x - 1) << '\n';
+		}
+	}
+}

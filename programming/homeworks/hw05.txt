@@ -1,0 +1,506 @@
+// DISCLAIMER: из-за непонятного ограничения на кол-во загружаемых файлов пришлось загрузить ДЗ одним файлом.
+
+// eratosphen.cpp
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+int main(int argc, char *argv[]) {
+	unsigned int n;
+	std::cout << "Enter n >> ";
+	std::cin >> n;
+
+	if (n < 1) {
+		std::cout << "n must be greater then 1\n";
+		return 1;
+	}
+
+	std::vector<bool> a(n + 1, true);
+	for (int i = 2; i * i <= n; i++) {
+		if (a[i]) {
+			for (int j = i * i; j <= n; j += i) {
+				a[j] = false;
+			}
+		}
+	}
+
+	std::cout << "Numbers: ";
+	for (int i = 2; i < a.size(); i++) {
+		if (a[i]) {
+			std::cout << i << ' ';
+		}
+	}
+	std::cout << '\n';
+}
+
+// evclid.cpp
+#include <iostream>
+#include <cmath>
+
+int main(int argc, char *argv[]) {
+	int a, b;
+	std::cout << "Enter a and b >> ";
+	std::cin >> a >> b;
+
+	// division
+	int d_a = a, d_b = b;
+	while (d_a != 0 && d_b != 0) {
+		if (d_a >= d_b) {
+			d_a %= d_b;
+		} else {
+			d_b %= d_a;
+		}
+	}
+	std::cout << "NOD (div) = " << d_a + d_b << '\n';
+
+	// subtraction
+	int s_a = a, s_b = b;
+	if (s_a == 0) s_a = s_b;
+	if (s_b == 0) s_b = s_a;
+	while (s_a != s_b) {
+		if (s_a > s_b) {
+			s_a -= s_b;
+		} else {
+			s_b -= s_a;
+		}
+	}
+	std::cout << "NOD (sub) = " << s_a << '\n';
+
+}
+
+// files14.cpp
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+int find_max(std::vector<int> const &numbers) {
+	for (int i = 0; i < numbers.size() - 1; i++) {
+		for (int j = numbers.size() - 1; j > i; j--) {
+			auto ci = i;
+			auto cj = j;
+			while (ci < cj) {
+				if (numbers[ci] != numbers[cj]) {
+					break;
+				}
+				ci++;
+				cj--;
+			}
+			if (ci < cj) {
+				continue;
+			}
+			return j - i + 1;
+		}
+	}
+	return 0;
+}
+
+int main(int argc, char *argv[]) {
+	unsigned int n;
+	std::cout << "Enter N >> ";
+	std::cin >> n;
+
+	if (n < 2) {
+		std::cout << "N can not be less then 2\n";
+		return 1;
+	}
+
+	std::vector<int> numbers;
+	for (int i = 1; i <= n; i++) {
+		std::cout << "Enter " << i << " number >> ";
+		int current;
+		std::cin >> current;
+		numbers.push_back(current);
+	}
+
+	std::ofstream fo;
+	fo.open("test");
+	if (!fo.is_open()) {
+		std::cout << "Can not open file for writing\n";
+		return 1;
+	}
+	for (auto n : numbers) {
+		fo << n << '\n';
+	}
+	fo.close();
+
+	std::cout << "Max length: " << find_max(numbers) << '\n';
+	std::cout << "Content:\n";
+	for (auto n: numbers) {
+		std::cout << n << '\n';
+	}
+	return 0;
+}
+
+// files24.cpp
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <iomanip>
+
+struct ResultRow {
+	std::string country;
+	int golden;
+	int silver;
+	int bronze;
+	int medals;
+	int points;
+};
+
+int main(int argc, char *argv[]) {
+
+	std::cout << "=== Olympics calculator ===\n"
+			  << "Enter data in format:\n"
+			  << "COUNTRY GOLDEN_MEDALS SILVER_MEDALS BRONZE_MEDALS\n"
+			  << "To end input process enter empty line\n"
+			  << "Enter data:\n";
+
+	std::vector<ResultRow> results;
+
+	int country_max_width = 7;
+
+	std::string s;
+	while (results.empty() || !s.empty()) {
+		getline(std::cin, s);
+		if (s.empty()) continue;
+
+		std::stringstream ss(s);
+
+		ResultRow row;
+		ss >> row.country >> row.golden >> row.silver >> row.bronze;
+		results.push_back(row);
+
+		country_max_width = std::max(country_max_width, (int) row.country.size());
+	}
+
+	for (auto &row : results) {
+		row.medals = row.golden + row.silver + row.bronze;
+		row.points = row.golden * 7 + row.silver * 6 + row.bronze * 5;
+	}
+
+	std::sort(results.begin(), results.end(),
+		[](ResultRow const &r1, ResultRow const &r2){
+			return r1.country < r2.country;
+		}
+	);
+
+	std::ofstream fo("olympics");
+	if (!fo.is_open()) {
+		std::cout << "Can not open file for writing\n";
+		return 1;
+	}
+	fo << std::setw(country_max_width) << "Country" << '\t'
+		<< std::setw(6) << "Golden" << '\t'
+		<< std::setw(6) << "Silver" << '\t'
+		<< std::setw(6) << "Bronze" << '\t'
+		<< std::setw(6) << "Medals" << '\t'
+		<< std::setw(6) << "Points" << "\t\n";
+
+	std::cout << std::setw(country_max_width) << "Country" << '\t'
+		<< std::setw(6) << "Golden" << '\t'
+		<< std::setw(6) << "Silver" << '\t'
+		<< std::setw(6) << "Bronze" << '\t'
+		<< std::setw(6) << "Medals" << '\t'
+		<< std::setw(6) << "Points" << "\t\n";
+
+	for (auto const &row : results) {
+
+		fo << std::setw(country_max_width) << row.country << '\t'
+			<< std::setw(6) << row.golden << '\t'
+			<< std::setw(6) << row.silver << '\t'
+			<< std::setw(6) << row.bronze << '\t'
+			<< std::setw(6) << row.medals << '\t'
+			<< std::setw(6) << row.points << "\t\n";
+
+		std::cout << std::setw(country_max_width) << row.country << '\t'
+			<< std::setw(6) << row.golden << '\t'
+			<< std::setw(6) << row.silver << '\t'
+			<< std::setw(6) << row.bronze << '\t'
+			<< std::setw(6) << row.medals << '\t'
+			<< std::setw(6) << row.points << "\t\n";
+	}
+}
+
+// rows24.cpp
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <vector>
+
+int convert_to_10(std::string num, int base) {
+	int result = 0;
+
+	for (int i = 0; i < num.size(); i++) {
+		auto c = num[i];
+		int n = 0;
+		if (std::isdigit(c)) {
+			n = c - '0';
+		} else {
+			n = c - 'A' + 10;
+		}
+
+		if (n >= base) {
+			return -1;
+		}
+
+		result += n * std::pow(base, num.size() - 1 - i);
+
+	}
+	return result;
+}
+
+std::string convert_from_10(int num, int base) {
+	if (num == 0) {
+		return "0";
+	}
+
+	std::string result;
+
+	while(num > 0) {
+		auto m = num % base;
+		char c;
+		if (m > 9) {
+			c = 'A' + m - 10;
+		} else {
+			c = std::to_string(m)[0];
+		}
+		result += c;
+
+		num = num / base;
+	}
+
+	std::reverse(result.begin(), result.end());
+
+	return result;
+}
+
+int main(int argc, char *argv[]) {
+	std::cout << "On each line enter one number in 7 numbering system (to stop enter empty line) >>\n";
+	std::vector<std::string> numbers7;
+	std::string cn;
+	while (numbers7.empty() || !cn.empty()) {
+		getline(std::cin, cn);
+		if (!cn.empty()) {
+			numbers7.push_back(cn);
+		}
+	}
+
+	std::vector<std::string> numbers3;
+	for (auto n7 : numbers7) {
+		auto num = convert_to_10(n7, 7);
+		if (num == -1) {
+			std::cout << "Entered number '" << n7 << "' is incorrect\n";
+			return 1;
+		}
+		numbers3.push_back(convert_from_10(num, 3));
+	}
+
+	std::cout << "Numbers in 3 numbering system:\n";
+	for (auto n3 : numbers3) {
+		std::cout << n3 << '\n';
+	}
+}
+
+// rows48.cpp
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <numeric>
+#include <algorithm>
+#include <vector>
+
+int main(int argc, char *argv[]) {
+	std::cout << "On each line enter numbers splitted by space (to stop enter empty line) >>\n";
+	std::vector<std::vector<float>> numbers;
+	std::string cn;
+	int i = 0;
+	while (numbers.empty() || !cn.empty()) {
+		getline(std::cin, cn);
+		if (cn.empty()) {
+			break;
+		}
+
+		numbers.push_back({});
+		std::stringstream ss(cn);
+		float num;
+		while(ss >> num) {
+			numbers[i].push_back(num);
+		};
+		i++;
+	}
+
+	using pt = std::pair<int, float>;
+	std::vector<pt> averages;
+
+	for (int i = 0; i < numbers.size(); i++) {
+		averages.push_back({
+			i,
+			std::accumulate(numbers[i].begin(), numbers[i].end(), 0) / numbers[i].size()
+		});
+	}
+
+	std::sort(averages.begin(), averages.end(),
+		[](const pt &x, const pt &y) {
+    		return x.second > y.second;
+		}
+	);
+
+	std::cout << "Result:\n";
+	for (auto p : averages) {
+		std::cout << p.second << ": ";
+		for (auto n : numbers[p.first]) {
+			std::cout << n << ' ';
+		}
+		std::cout << '\n';
+	}
+}
+
+// textfiles24.cpp
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <map>
+
+int main(int argc, char *argv[]) {
+	std::string s;
+	std::string cs;
+	std::cout << "Enter content of file >>\n";
+	while (s.empty() || !cs.empty()) {
+		getline(std::cin, cs);
+		s += cs + '\n';
+	}
+
+	std::ofstream fo;
+	fo.open("test");
+	if (!fo.is_open()) {
+		std::cout << "Can not open file for writing\n";
+		return 1;
+	}
+	fo << s;
+	fo.close();
+
+	std::ifstream fi;
+	fi.open("test");
+	if (!fi.is_open()) {
+		std::cout << "Can not open file for reading\n";
+		return 1;
+	}
+
+	std::map<char, bool> chars {
+		{'B', true},
+		{'C', true},
+		{'D', true},
+		{'F', true},
+		{'G', true},
+		{'H', true},
+		{'J', true},
+		{'K', true},
+		{'L', true},
+		{'M', true},
+		{'N', true},
+		{'P', true},
+		{'Q', true},
+		{'R', true},
+		{'S', true},
+		{'T', true},
+		{'V', true},
+		{'W', true},
+		{'X', true},
+		{'Z', true},
+	};
+	std::map<char, unsigned int> char_count;
+	using pair_t = std::pair<char, unsigned int>;
+	while (std::getline(fi, s)) {
+		for (auto c : s) {
+			auto uc = std::toupper(c);
+			if (chars[uc]) {
+				char_count[uc]++;
+			}
+		}
+	}
+	fi.close();
+
+	auto c = std::min_element(
+    	std::begin(char_count), std::end(char_count),
+    	[] (const pair_t & p1, const pair_t & p2) {
+        	return p1.second < p2.second;
+    	}
+	);
+
+	std::cout << "least often consonant: " << c->first << '\n';
+}
+
+// textfiles32.cpp
+#include <iostream>
+#include <fstream>
+#include <cctype>
+#include <string>
+
+char make_shift(int const& shift, char const& first, int const& count, char const& c) {
+	auto shifted = (c - first + shift) % count;
+	if (shifted < 0) {
+		return first + count + shifted;
+	}
+	return first + shifted;
+}
+
+char shift_char(int const& shift, char const& c) {
+	if (std::isdigit(c)) {
+		return make_shift(shift, '0', 10, c);
+	} else if (std::isalpha(c)) {
+		if (std::toupper(c) == c) {
+			return make_shift(shift, 'A', 26, c);
+		} else {
+			return make_shift(shift, 'a', 26, c);
+		}
+	}
+	return c;
+}
+
+int main(int argc, char *argv[]) {
+	std::string s("");
+	std::string cs("");
+	std::cout << "Enter content of file >>\n";
+	while (s.empty() || !cs.empty()) {
+		getline(std::cin, cs);
+		s += cs + '\n';
+	}
+
+	std::ofstream fo;
+	fo.open("test");
+	if (!fo.is_open()) {
+		std::cout << "Can not open file for writing\n";
+		return 1;
+	}
+	fo << s;
+	fo.close();
+
+	int shift;
+	std::cout << "Enter encryption shift >> ";
+	std::cin >> shift;
+
+	std::ifstream fi;
+	fi.open("test");
+	if (!fi.is_open()) {
+		std::cout << "Can not open file for reading\n";
+		return 1;
+	}
+
+	fo.open("encrypted");
+	if (!fo.is_open()) {
+		std::cout << "Can not open file for writing encrypted text\n";
+		return 1;
+	}
+
+	while (std::getline(fi, s)) {
+		std::string encrypted;
+		for (auto c : s) {
+			encrypted += shift_char(shift, c);
+		}
+		fo << encrypted << '\n';
+	}
+	fi.close();
+	fo.close();
+}

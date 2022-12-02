@@ -1,0 +1,395 @@
+// DISCLAIMER: из-за непонятного ограничения на кол-во загружаемых файлов пришлось загрузить ДЗ одним файлом.
+
+// figures.cpp
+#include <iostream>
+#include <cmath>
+
+float rectangleS(float const& a, float const& b) {
+	return a * b;
+}
+
+float triangleS(float const& a, float const& b, float const& c) {
+	float const p = (a + b + c) / 2;
+	return std::sqrt(p * (p - a) * (p - b) * (p - c));
+}
+
+float circleS(float const& r) {
+	return M_PI * r * r;
+}
+
+int main(int argc, char *argv[]) {
+	float a, b, c, r;
+
+	std::cout << "Enter a and b to calculate S of rectangle >> ";
+	std::cin >> a >> b;
+	if (a <= 0 || b <= 0) {
+		std::cout << "a and b must be greter then 0\n";
+		return 1;
+	}
+	std::cout << "S of rectangle = " << rectangleS(a, b) << '\n';
+
+	std::cout << "Enter a, b, c to calculate S of triangle >> ";
+	std::cin >> a >> b >> c;
+	if (a <= 0 || b <= 0 || c <= 0) {
+		std::cout << "a, b and c must be greater then 0\n";
+		return 1;
+	}
+	if (a + b > c || a + c > b || c + b > a) {
+		std::cout << "Incorrect values\n";
+		return 1;
+	}
+	std::cout << "S of triangle = " << triangleS(a, b, c) << '\n';
+
+	std::cout << "Enter r to calculate S of circle >> ";
+	std::cin >> r;
+	if (r <= 0) {
+		std::cout << "r must be greater then 0\n";
+		return 1;
+	}
+	std::cout << "S of circle = " << circleS(r) << '\n';
+}
+
+// file.cpp
+#include <iostream>
+#include <fstream>
+
+int main(int argc, char *argv[])
+{
+	std::ofstream fo;
+	fo.open("test");
+	for (int i = 1; i <= 10; i++) {
+		float x;
+		std::cout << "Enter " << i << " number >> ";
+		std::cin >> x;
+		fo << x << '\n';
+	}
+	fo.close();
+
+	std::ifstream fi;
+	fi.open("test");
+	float s = 0;
+	for (int i = 0; i < 10; i++) {
+		float x;
+		fi >> x;
+		s += x;
+	}
+	fi.close();
+
+	std::cout << "Sum of numbers = " << s << '\n';
+}
+
+// gen.cpp
+#include <iostream>
+
+int f(int const& m, int const& b, int const& c, int const& i) {
+	if (i == 0) {
+		return 0;
+	}
+	return (m * f(m, b, c, i - 1) + b) % c;
+}
+
+int main(int argc, char *argv[]) {
+	int m, b, c, i;
+
+	std::cout << "Enter m, b, c and i >> ";
+	std::cin >> m >> b >> c >> i;
+
+	if (c == 0) {
+		std::cout << "c can not be 0\n";
+		return 1;
+	}
+
+	std::cout << "Generated number = " << f(m, b, c, i) << '\n';
+}
+
+// matrix.cpp
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+#define MATRIX(T) std::vector<std::vector<T>>
+
+int main(int argc, char *argv[]) {
+
+	MATRIX(float) sales {
+		{5, 2, 0, 10},
+		{3, 5, 2, 5},
+		{20, 0, 0, 0},
+	};
+
+	MATRIX(float) prices {
+		{1.2, 0.5},
+		{2.8, 0.4},
+		{5, 1},
+		{2, 1.5},
+	};
+
+	MATRIX(float) c;
+
+	for (int i = 0; i < sales.size(); i++) {
+		c.push_back({});
+		for (int j = 0; j < prices[0].size(); j++) {
+			float mul = 0;
+			for (int q = 0; q < sales[i].size(); q++) {
+				mul += sales[i][q] * prices[q][j];
+			}
+			c[i].push_back(mul);
+		}
+	}
+
+	std::cout << "Matrix C:\n";
+	for (int i = 0; i < c.size(); i++) {
+		for (int j = 0; j < c[i].size(); j++) {
+			std::cout << c[i][j] << ' ';
+		}
+		std::cout << '\n';
+	}
+
+	float max_income = 0;
+	float min_income = INFINITY;
+	float max_com = 0;
+	float min_com = INFINITY;
+	float full_income = 0;
+	float full_com = 0;
+	float full_money = 0;
+
+	for (int i = 0; i < c.size(); i++) {
+		auto current_income = c[i][0];
+		auto current_com = c[i][1];
+
+		max_income = std::max(current_income, max_income);
+		min_income = std::min(current_income, min_income);
+
+		max_com = std::max(current_com, max_com);
+		min_com = std::min(current_com, min_com);
+
+		full_income += current_income;
+		full_com += current_com;
+	}
+
+	full_money = full_income + full_com;
+
+	std::cout << "\nAnswers:\n"
+		<< "1.1 Max income      : " << max_income << '\n'
+		<< "1.2 Min income      : " << min_income << '\n'
+		<< "2.1 Max commission  : " << max_com << '\n'
+		<< "2.2 Min commission  : " << min_com << '\n'
+		<< "3.  Full income     : " << full_income << '\n'
+		<< "4.  Full commission : " << full_com << '\n'
+		<< "5.  Full money      : " << full_money << '\n';
+}
+
+// oldglory.cpp
+#include <iostream>
+
+#define STAR_CHAR '*'
+#define FILLED_CHAR '|'
+#define UNFILLED_CHAR ' '
+
+int main(int argc, char *argv[]) {
+	for (int i = 0; i < 13; i++) {
+		bool filled_line = i % 2 == 0;
+
+		for (int j = 0; j < 42; j++) {
+			bool is_line = i >= 6 || j >= 8 * 2 - 1;
+			bool is_star = !is_line && j % 2 == 0;
+
+			if (is_line && filled_line) {
+				std::cout << FILLED_CHAR;
+			} else if (!filled_line && is_line || !is_star) {
+				std::cout << UNFILLED_CHAR;
+			} else if (is_star) {
+				std::cout << STAR_CHAR;
+			}
+		}
+		std::cout << '\n';
+	}
+}
+
+// recognitor.cpp
+#include <iostream>
+#include <string>
+#include <map>
+#include <cmath>
+
+int main(int argc, char *argv[]) {
+	std::string roman;
+	std::cout << "Enter Roman number >> ";
+	std::cin >> roman;
+
+	std::map<char, int> values {
+		{'I', 1},
+		{'V', 5},
+		{'X', 10},
+		{'L', 50},
+		{'C', 100},
+		{'D', 500},
+		{'M', 1000},
+	};
+
+	int n = 0;
+	for (int i = 0; i < roman.size(); i++) {
+		auto c = std::toupper(roman[i]);
+		auto val = values[c];
+		for (int j = i + 1; j < roman.size(); j++) {
+			auto nextc = std::toupper(roman[j]);
+			if (j == i + 1 && val < values[nextc]) {
+				val *= -1;
+			} else if (std::abs(val) < values[nextc]) {
+				std::cout << "This is incorrect Roman number\n";
+				return 1;
+			}
+		}
+		n += val;
+	}
+
+	std::cout << "Number = " << n << '\n';
+}
+
+// sign.cpp
+#include <iostream>
+
+int sign(float const& x) {
+	if (x > 0) {
+		return 1;
+	} else if (x == 0) {
+		return 0;
+	} else {
+		return -1;
+	}
+}
+
+int main(int argc, char *argv[])
+{
+	float x;
+	std::cout << "sign(x)\nEnter x >> ";
+	std::cin >> x;
+
+	std::cout << sign(x) << '\n';
+
+}
+
+// sin.cpp
+#include <iostream>
+#include <cmath>
+#include <ncurses.h>
+
+#define CENTER_CHAR '+'
+#define LINES_HOR_CHAR '-'
+#define LINES_VER_CHAR '|'
+#define GRAPH_CHAR '*'
+
+int main(int argc, char *argv[]) {
+	initscr();
+	noecho();
+	cbreak();
+	curs_set(0);
+
+	auto center_x = COLS / 2;
+	auto center_y = LINES / 2;
+
+	for (int y = 0; y < LINES; y++) {
+		mvaddch(y, center_x, LINES_VER_CHAR);
+	}
+	for (int x = 0; x < COLS; x++) {
+		mvaddch(center_y, x, LINES_HOR_CHAR);
+	}
+	mvaddch(center_y, center_x, CENTER_CHAR);
+
+	for (int x = 0; x < COLS; x++) {
+		for (int y = 0; y < LINES; y++) {
+			float px = (center_x - x);
+			float b = LINES / 3;
+			float c = COLS / 13;
+			float py = b * std::sin(px / c);
+			if (std::abs(py - center_y + y) < 1) {
+				mvaddch(y, x, GRAPH_CHAR);
+			}
+		}
+	}
+
+	refresh();
+	while(auto c = getch()) {
+		if (c == 'q') break;
+	};
+	endwin();
+}
+
+// systems.cpp
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <cmath>
+
+int convert_to_10(std::string num, int base) {
+	int result = 0;
+
+	for (int i = 0; i < num.size(); i++) {
+		auto c = num[i];
+		int n = 0;
+		if (std::isdigit(c)) {
+			n = c - '0';
+		} else {
+			n = c - 'A' + 10;
+		}
+
+		if (n >= base) {
+			return -1;
+		}
+
+		result += n * std::pow(base, num.size() - 1 - i);
+
+	}
+	return result;
+}
+
+std::string convert_from_10(int num, int base) {
+	if (num == 0) {
+		return "0";
+	}
+
+	std::string result;
+
+	while(num > 0) {
+		auto m = num % base;
+		char c;
+		if (m > 9) {
+			c = 'A' + m - 10;
+		} else {
+			c = std::to_string(m)[0];
+		}
+		result += c;
+
+		num = num / base;
+	}
+
+	std::reverse(result.begin(), result.end());
+
+	return result;
+}
+
+int main(int argc, char *argv[]) {
+
+	std::string number;
+	int from_ns, to_ns;
+	std::cout << "Enter number and its numbering system >> ";
+	std::cin >> number >> from_ns;
+	if (from_ns <= 1 || from_ns > 36) {
+		std::cout << "Incorrect numbering system (must be 1 < ns <= 36)\n";
+		return 1;
+	}
+
+	std::cout << "Enter numbering system to convert number to >> ";
+	std::cin >> to_ns;
+	if (to_ns <= 1 || to_ns > 36) {
+		std::cout << "Incorrect numbering system (must be 1 < ns <= 36)\n";
+		return 1;
+	}
+
+	auto num = convert_to_10(number, from_ns);
+	if (num == -1) {
+		std::cout << "Entered number is incorrect\n";
+		return 1;
+	}
+	std::cout << convert_from_10(num, to_ns) << '\n';
+}
